@@ -1,5 +1,13 @@
 package org.avr.fileread.records;
 
+
+/**
+ * A generic record type used when line from a file does not conform to its
+ * described layout.
+ * 
+ * @author Alfonso
+ *
+ */
 public class UnParsableRecord {
 	
 	public UnParsableRecord(String line) {
