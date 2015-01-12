@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.avr.fileread.records.DataRecord;
 import org.avr.fileread.records.Field;
 import org.avr.fileread.records.Header;
+import org.avr.fileread.records.IRecord;
 import org.avr.fileread.records.Trailer;
 import org.avr.fileread.records.UnParsableRecord;
 
@@ -76,7 +77,7 @@ public class FileDigester {
 	private Object parseTrailer(String line, Trailer trlr) {
 		return null;
 	}
-	private Object parseDataRec(String line, Trailer trlr) {
+	private Object parseDataRec(String line, IRecord rec) {
 		return null;
 	}
 }

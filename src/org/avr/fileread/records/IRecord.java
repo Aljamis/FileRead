@@ -11,4 +11,6 @@ import java.util.List;
 public interface IRecord {
 
 	public List<Field> getFields();
+	public boolean isDelimited();
+	
 }

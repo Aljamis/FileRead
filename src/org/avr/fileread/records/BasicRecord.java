@@ -12,6 +12,7 @@ public abstract class BasicRecord implements IRecord {
 	private Integer uidStart = null;
 	private Integer uidEnd = null;
 	private List<Field> fields = new ArrayList<Field>();
+	private boolean delimited = false;
 	
 	
 	public String getClassName() { return className; }
@@ -28,6 +29,9 @@ public abstract class BasicRecord implements IRecord {
 	
 	public List<Field> getFields() { return fields; }
 	public void setFields(List<Field> fields) { this.fields = fields; }
+	
+	public boolean isDelimited() { return this.delimited; }
+	public void setDelimited(boolean boo) { this.delimited = boo; }
 	
 	
 	public String toString() {
