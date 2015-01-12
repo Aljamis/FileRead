@@ -272,6 +272,12 @@ public class FileReadWriter {
 	
 	
 	
+	/**
+	 * Read a line from the file returning an Object defined in the layout
+	 * XML.
+	 * 
+	 * @return
+	 */
 	public Object readNextLine() {
 		myDigester.parseLine("");
 		return null;
