@@ -29,10 +29,19 @@ public class MegaField extends Field implements IRecord {
 	public void setClassName(String className) { this.className = className; }
 	public List<Field> getFields() { return fields; }
 	public void setFields(List<Field> fields) { this.fields = fields; }
+	
+	/* These 2 fields are specific to Records but as a MegaField is a type
+	 * of Record it should also have these fields	 */
 	private boolean delimited = false;
+	private String delimiter = "";
 	
 	public boolean isDelimited() { return this.delimited; }
 	public void setDelimited(boolean boo) { this.delimited = boo; }
+	
+	public String getDelimiter() { return this.delimiter; }
+	public void setDelimiter(String d) { this.delimiter = d; }
+	
+	
 	
 	public String toString() {
 		return this.toString("");

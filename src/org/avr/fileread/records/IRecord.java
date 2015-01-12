@@ -10,7 +10,9 @@ import java.util.List;
  */
 public interface IRecord {
 
+	public String getClassName();
 	public List<Field> getFields();
 	public boolean isDelimited();
+	public String getDelimiter();
 	
 }
