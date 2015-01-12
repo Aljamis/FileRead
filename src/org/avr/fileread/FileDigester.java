@@ -23,6 +23,13 @@ public class FileDigester {
 	public void setMyFileLayouts(FlatFile f) { this.myFileLayouts = f; }
 
 	
+	
+	/**
+	 * Determine which record type this is (Header, Trailer or common data record)
+	 * 
+	 * @param line
+	 * @return
+	 */
 	protected Object parseLine(String line ) {
 		if (myFileLayouts.getHeader() != null) {
 			int start = myFileLayouts.getHeader().getUidStart();
