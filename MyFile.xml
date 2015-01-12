@@ -1,0 +1,61 @@
+<FileLayout>
+	<record classname="org.avr.Member" uid="R" uidStart="0" uidEnd="0" >
+		<field name="firstName" trim="false" occurs="1">
+			<type>String</type>
+			<start>1</start>
+			<end>30</end>
+		</field>
+		<field name="lastName" trim="false">
+			<type>String</type>
+			<start>31</start>
+			<end>60</end>
+		</field>
+		
+		<megaField classname="org.avr.Address" name="homeAddr">
+			<field name="addr1" trim="false">
+				<type>String</type>
+				<start>61</start>
+				<end>90</end>
+			</field>
+			<field name="addr2" trim="false">
+				<type>String</type>
+				<start>91</start>
+				<end>130</end>
+			</field>
+			<field name="city" trim="false">
+				<type>String</type>
+				<start>131</start>
+				<end>160</end>
+			</field>
+			<field name="state" trim="false">
+				<type>String</type>
+				<start>161</start>
+				<end>162</end>
+			</field>
+			<!--  field name="zip" trim="false">
+				<type>String</type>
+				<start>163</start>
+				<end>172</end>
+			</field  -->
+			<megaField classname="org.avr.ZipCode" name="zipCode">
+				<field name="zip" trim="false">
+					<type>String</type>
+					<start>163</start>
+					<end>168</end>
+				</field>
+				<field name="zip4" trim="false">
+					<type>String</type>
+					<start>169</start>
+					<end>172</end>
+				</field>
+			</megaField>
+		</megaField>
+		
+		<field name="email" trim="false">
+			<type>String</type>
+			<start>173</start>
+			<end>223</end>
+		</field>
+		
+	</record>
+</FileLayout>
