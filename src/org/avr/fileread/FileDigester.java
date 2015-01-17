@@ -1,8 +1,14 @@
 package org.avr.fileread;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.avr.fileread.exceptions.ParsingException;
 import org.avr.fileread.records.DataRecord;
 import org.avr.fileread.records.DelimitedLine;
 import org.avr.fileread.records.Field;
@@ -86,8 +92,12 @@ public class FileDigester {
 			this.delimitedLine = new DelimitedLine( line , rec.getDelimiter());
 		
 		Object obj = instantiateRecord( rec.getClassName());
-		parseFields( line , obj , rec );
-		return null;
+		try {
+			parseFields( line , obj , rec );
+			return obj;
+		} catch (ParsingException pEx) {
+			return new UnParsableRecord( line );
+		}
 	}
 	
 	
@@ -124,7 +134,7 @@ public class FileDigester {
 	private void parseFields(String line , Object obj , IRecord rec ) {
 		for (Field fld : rec.getFields()) {
 			Object dataField = doFieldStuff( line , obj , fld );
-			setMemberVariable( obj , dataField );
+			setMemberVariable( obj , dataField , fld);
 		}
 	}
 	
@@ -145,20 +155,119 @@ public class FileDigester {
 			parseFields(line, o, mFld );
 		}
 		
-		String prelimField = delimitedLine.getNextToken();
+		String prelimField = nextToken(line, fld);
+		
+		switch (fld.getType()) {
+		case "String":
+			return prelimField;
+
+		case "int":
+			return intField(prelimField , fld.getName());
+
+		case "double":
+			return doubleField(prelimField, fld.getName());
+
+		case "date":
+			dateField(prelimField , fld);
+			break;
+
+		default:
+			log.error("Field Type ["+ fld.getType() +"] is not a valid type (String, int, double, date).");
+			break;
+		}
 		
 		return null;
 	}
 	
 	
-	private void setMemberVariable( Object obj , Object field ) {
-		
+	private void setMemberVariable( Object obj , Object dataField , Field fld ) {
+		String methodName = "set"+ fld.getName().substring(0,1).toUpperCase();
+		methodName += fld.getName().substring(1);
+		try {
+			Method m = obj.getClass().getMethod( methodName , new Class[] { dataField.getClass() } );
+			m.invoke(obj, dataField);
+		} catch (NoSuchMethodException nsmEx) {
+			throw new ParsingException(methodName +" does not exist");
+		} catch (InvocationTargetException itEx) {
+			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName());
+		} catch (IllegalAccessException iaEx) {
+			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
+		}
 	}
 	
 	
 	
-	private String nextToken() {
-		
-		return "";
+	/**
+	 * Retrieve the next portion of the file record (line) to be parsed into a 
+	 * member variable.
+	 * @param line
+	 * @param fld
+	 * @return 
+	 */
+	private String nextToken(String line , Field fld) {
+		if (this.delimitedLine == null) {
+			if (fld.isTrim())
+					return line.substring( fld.getStart() , fld.getEnd()).trim();
+			return line.substring( fld.getStart() , fld.getEnd());
+		}
+		return this.delimitedLine.getNextToken();
+	}
+	
+	
+	
+	
+	/**
+	 * Turn the string from the file record into an Integer. Otherwise, throw
+	 * a RunTimeException:  ParsingException.
+	 * @param in
+	 * @param fldName
+	 * @return
+	 */
+	private Integer intField(String in , String fldName) {
+		try {
+			Integer ingr = new Integer(in);
+			return ingr;
+		} catch (NumberFormatException nfEx) {
+			log.error("["+ fldName +"] is not an Integer : "+ in );
+			throw new ParsingException("["+ fldName +"] is not an Integer : "+ in );
+		}
+	}
+	
+	
+	
+	/**
+	 * Turn the string from the file record into a Double.  Otherwise, throw
+	 * a RunTimeException:  ParsingException.
+	 * @param in
+	 * @param fldName
+	 * @return
+	 */
+	private Double doubleField(String in , String fldName) {
+		try {
+			Double dbl = new Double(in);
+			return dbl;
+		} catch (NumberFormatException nfEx) {
+			log.error("["+ fldName +"] is not a Double : "+ in );
+			throw new ParsingException("["+ fldName +"] is not a Double: "+ in );
+		}
+	}
+	
+	
+	
+	/**
+	 * Turn the string from the file record into a Date.  Otherwise, throw
+	 * a RunTimeException:  ParsingException.
+	 * @param in
+	 * @param fldName
+	 * @return
+	 */
+	private Date dateField(String in , Field fld) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(fld.getFormat());
+			Date dt = sdf.parse(in);
+			return dt;
+		} catch (ParseException pEx) {
+			throw new ParsingException(fld.getName() +" does not match format ["+ fld.getFormat() +"]");
+		}
 	}
 }

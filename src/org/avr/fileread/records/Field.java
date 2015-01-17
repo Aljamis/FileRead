@@ -8,6 +8,7 @@ public class Field {
 	private int end;
 	private int occurs;
 	private Boolean trim;
+	private String format;
 	
 	
 	public String getName() { return name; }
@@ -27,4 +28,7 @@ public class Field {
 	
 	public Boolean isTrim() { return trim; }
 	public void setTrim(Boolean trim) { this.trim = trim; }
+	
+	public String getFormat() { return format; }
+	public void setFormat(String frmt) { this.format = frmt; }
 }

@@ -57,5 +57,11 @@
 			<end>223</end>
 		</field>
 		
+		<field name="dob" trim="false">
+			<type format="yyyyMMdd">date</type>
+			<start>224</start>
+			<end>233</end>
+		</field>
+		
 	</record>
 </FileLayout>

@@ -1,6 +1,7 @@
 package org.avr.fileread;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -186,6 +187,7 @@ public class FileReadWriter {
 				switch ( newEle.getNodeName()) {
 				case "type":
 					fld.setType( newEle.getTextContent() );
+					dateFormat( fld , newEle );
 					break;
 				case "start":
 					fld.setStart( parseInt( newEle.getTextContent() , newEle.getNodeName() ) );
@@ -196,6 +198,27 @@ public class FileReadWriter {
 				default:
 					throw new LayoutException(  newEle.getNodeName() +" is not a valid node for field");
 				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * If the field type is "date" it must have an attribute "format" defining
+	 * the date format in terms of SimpleDateFormat.
+	 * @param fld
+	 * @param ele
+	 */
+	private void dateFormat(Field fld , Element ele) throws LayoutException {
+		if ("date".equalsIgnoreCase( fld.getType() )) {
+			String frmt = ele.getAttribute("format");
+			if (frmt == null || "".equalsIgnoreCase( frmt ) )
+				throw new LayoutException("Date field ["+ fld.getName() +"] missing format.");
+			
+			try { 
+				new SimpleDateFormat(frmt);
+			} catch (IllegalArgumentException iaEx) {
+				throw new LayoutException( "Invalid Date Format ["+ frmt +"] for field "+ fld.getName() );
 			}
 		}
 	}
