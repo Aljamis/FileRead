@@ -1,11 +1,11 @@
 <FileLayout>
-	<record classname="org.avr.Member" uid="R" uidStart="0" uidEnd="0" >
-		<field name="firstName" trim="false" occurs="1">
+	<record classname="org.avr.Member" >
+		<field name="firstName" trim="true" occurs="1">
 			<type>String</type>
 			<start>1</start>
 			<end>30</end>
 		</field>
-		<field name="lastName" trim="false">
+		<field name="lastName" trim="true">
 			<type>String</type>
 			<start>31</start>
 			<end>60</end>
@@ -41,12 +41,12 @@
 				<field name="zip" trim="false">
 					<type>String</type>
 					<start>163</start>
-					<end>168</end>
+					<end>167</end>
 				</field>
 				<field name="zip4" trim="false">
 					<type>String</type>
-					<start>169</start>
-					<end>172</end>
+					<start>168</start>
+					<end>171</end>
 				</field>
 			</megaField>
 		</megaField>
@@ -54,13 +54,13 @@
 		<field name="email" trim="false">
 			<type>String</type>
 			<start>173</start>
-			<end>223</end>
+			<end>224</end>
 		</field>
 		
 		<field name="dob" trim="false">
 			<type format="yyyyMMdd">date</type>
-			<start>224</start>
-			<end>233</end>
+			<start>225</start>
+			<end>232</end>
 		</field>
 		
 	</record>

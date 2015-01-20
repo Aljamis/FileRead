@@ -20,7 +20,7 @@ import org.avr.fileread.records.UnParsableRecord;
 
 
 /**
- * 
+ * Class that parses through a record from a file and populates an object.
  * @author Alfonso
  *
  */
@@ -43,8 +43,8 @@ public class FileDigester {
 	 */
 	protected Object parseLine(String line ) {
 		if (myFileLayouts.getHeader() != null) {
-			int start = myFileLayouts.getHeader().getUidStart();
-			int end = myFileLayouts.getHeader().getUidEnd();
+			Integer start = myFileLayouts.getHeader().getUidStart();
+			Integer end = myFileLayouts.getHeader().getUidEnd();
 			
 			if( ( line.substring( start , end) ).equalsIgnoreCase( myFileLayouts.getHeader().getUid() ) ) {
 				log.debug("Found a header record");
@@ -53,8 +53,8 @@ public class FileDigester {
 		}
 		
 		if (myFileLayouts.getTrailer() != null) {
-			int start = myFileLayouts.getTrailer().getUidStart();
-			int end = myFileLayouts.getTrailer().getUidEnd();
+			Integer start = myFileLayouts.getTrailer().getUidStart();
+			Integer end = myFileLayouts.getTrailer().getUidEnd();
 			
 			if( ( line.substring( start , end) ).equalsIgnoreCase( myFileLayouts.getTrailer().getUid() ) ) {
 				log.debug("Found a trailer record");
@@ -66,12 +66,12 @@ public class FileDigester {
 			Set<String> keys = myFileLayouts.getDataRecords().keySet();
 			for (String key : keys) {
 				DataRecord rec = (DataRecord)myFileLayouts.getDataRecords().get( key );
-				int start = rec.getUidStart();
-				int end = rec.getUidEnd();
+				Integer start = rec.getUidStart();
+				Integer end = rec.getUidEnd();
 				
-				if( ( line.substring( start , end) ).equalsIgnoreCase( myFileLayouts.getTrailer().getUid() ) ) {
+				if( ( line.substring( start , end) ).equalsIgnoreCase( rec.getUid() ) ) {
 					log.debug("Found a DATA record");
-					return parseDataRec( line , myFileLayouts.getTrailer() );
+					return parseDataRec( line , rec );
 				}
 				
 			}
@@ -153,6 +153,8 @@ public class FileDigester {
 			MegaField mFld = (MegaField) fld;
 			Object o = instantiateRecord( mFld.getClassName() );
 			parseFields(line, o, mFld );
+			
+			return o;
 		}
 		
 		String prelimField = nextToken(line, fld);
@@ -168,8 +170,7 @@ public class FileDigester {
 			return doubleField(prelimField, fld.getName());
 
 		case "date":
-			dateField(prelimField , fld);
-			break;
+			return dateField(prelimField , fld);
 
 		default:
 			log.error("Field Type ["+ fld.getType() +"] is not a valid type (String, int, double, date).");
@@ -193,6 +194,10 @@ public class FileDigester {
 		} catch (IllegalAccessException iaEx) {
 			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
 		}
+		
+		catch (NullPointerException npEx) {
+			System.out.println( fld +"  "+ methodName);
+		}
 	}
 	
 	
@@ -207,8 +212,8 @@ public class FileDigester {
 	private String nextToken(String line , Field fld) {
 		if (this.delimitedLine == null) {
 			if (fld.isTrim())
-					return line.substring( fld.getStart() , fld.getEnd()).trim();
-			return line.substring( fld.getStart() , fld.getEnd());
+					return line.substring( fld.getStart() -1 , fld.getEnd()).trim();
+			return line.substring( fld.getStart() -1 , fld.getEnd());
 		}
 		return this.delimitedLine.getNextToken();
 	}

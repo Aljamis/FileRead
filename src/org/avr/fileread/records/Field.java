@@ -11,6 +11,14 @@ public class Field {
 	private String format;
 	
 	
+	public String toString() {
+		StringBuffer str = new StringBuffer();
+		str.append( getName() ).append(" [").append( getType() ).append("] ");
+		str.append( getStart() ).append(" - ").append( end );
+		return str.toString();
+	}
+	
+	
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 	

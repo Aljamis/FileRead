@@ -8,7 +8,7 @@ import org.avr.fileread.exceptions.LayoutException;
 public abstract class BasicRecord implements IRecord {
 	
 	private String className = "";
-	private String uid = null;			//  Unique record identifier
+	private String uid = "";			//  Unique record identifier
 	private Integer uidStart = null;
 	private Integer uidEnd = null;
 	private List<Field> fields = new ArrayList<Field>();
@@ -20,19 +20,28 @@ public abstract class BasicRecord implements IRecord {
 	public void setClassName(String className) { this.className = className; }
 	
 	public String getUid() { return uid; }
-	public void setUid(String uid) throws LayoutException { this.uid = uid; validate(); }
+	public void setUid(String uid) throws LayoutException {
+//		if (uid != null)
+//			if (uid.isEmpty()) uid = null;
+//			else this.uid = uid;
+		this.uid = uid;
+	}
 	
 	public Integer getUidStart() { return uidStart; }
-	public void setUidStart(Integer uidStart) throws LayoutException { this.uidStart = uidStart; validate(); }
+	public void setUidStart(Integer uidStart) throws LayoutException { this.uidStart = uidStart; }
 	
 	public Integer getUidEnd() { return uidEnd; }
-	public void setUidEnd(Integer uidEnd) throws LayoutException { this.uidEnd = uidEnd; validate(); }
+	public void setUidEnd(Integer uidEnd) throws LayoutException { this.uidEnd = uidEnd; }
 	
 	public List<Field> getFields() { return fields; }
 	public void setFields(List<Field> fields) { this.fields = fields; }
 	
-	public boolean isDelimited() { return this.delimited; }
-	public void setDelimited(boolean boo) { this.delimited = boo; }
+	public boolean isDelimited() {
+		if (delimiter == null || delimiter.trim().isEmpty() )
+			return false;
+		return true; 
+	}
+//	public void setDelimited(boolean boo) { this.delimited = boo; }
 	
 	public String getDelimiter() { return this.delimiter; }
 	public void setDelimiter(String d) { this.delimiter = d; }
@@ -71,15 +80,19 @@ public abstract class BasicRecord implements IRecord {
 	 * @throws LayoutException
 	 */
 	private boolean validate() throws LayoutException {
-		if ( uid != null
-				&& uidStart!= null
-				&& uidEnd !=  null) {
+		if ( uid != null && !uid.isEmpty() ) {
 			if (uid.length() != ( 1+ uidEnd - uidStart )) {
 				throw new LayoutException(getClassName() +" UID will not fit between positions "+ uidStart +" and "+ uidEnd );
 			}
 			return true;
+		} else {
+			/* uid is NULL but uidStart and uidEnd have values */
+			if ( ( uidStart!= null && uidEnd !=  null )
+				&& ( uidEnd > uidStart ) ) {
+				throw new LayoutException(getClassName() +" uidStart and uidEnd are defined without a uid" );
+			}
 		}
-		return false;
+		return true; 
 	}
 	
 	
