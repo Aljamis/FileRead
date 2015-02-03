@@ -53,7 +53,7 @@
 		
 		<field name="email" trim="false">
 			<type>String</type>
-			<start>173</start>
+			<start>172</start>
 			<end>224</end>
 		</field>
 		

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.avr.fileread.exceptions.ParsingException;
-import org.avr.fileread.records.DelimitedLine;
 import org.avr.fileread.records.UnParsableRecord;
 
 

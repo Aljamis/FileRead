@@ -1,4 +1,4 @@
-package org.avr.fileread.records;
+package org.avr.fileread;
 
 /**
  * For lines that are delimited the current token position MUST be managed in one central
@@ -7,17 +7,18 @@ package org.avr.fileread.records;
  * @author axviareque
  *
  */
-public class DelimitedLine {
+class DelimitedLine {
 	
 	private String theLine;
 	private String theDelimiter;
 	private String[] theTokens;
 	private int currentIndex;
 	
+	private final static String META_CHARS = "<([{\\^-=$!|]})?*+.>";
 	
 	
 	public DelimitedLine(String line, String delimiter ) {
-		this.theDelimiter = delimiter;
+		this.setTheDelimiter( delimiter );
 		this.theLine = line;
 		
 		this.theTokens = theLine.split( this.getTheDelimiter() );
@@ -31,6 +32,17 @@ public class DelimitedLine {
 	
 	public int numOfTokens() {
 		return this.theTokens.length;
+	}
+	
+	
+	
+	/**
+	 * Is this character a META character used in REGEX matching.
+	 * @param c
+	 * @return
+	 */
+	private boolean isMetaChar(char c) {
+		return META_CHARS.indexOf( c ) >= 0;
 	}
 	
 	
@@ -53,10 +65,26 @@ public class DelimitedLine {
 		return theDelimiter;
 	}
 	/**
+	 * Examine the delimiter for any META characters used in REGEX matching.  If a 
+	 * META character is found it MUST be escaped (prefixed with "\\").
 	 * @param theDelimiter The theDelimiter to set.
 	 */
-	public void setTheDelimiter(String theDelimiter) {
-		this.theDelimiter = theDelimiter;
+	public void setTheDelimiter(String str) {
+		if (str.length() == 1 ) {
+			if ( isMetaChar( str.charAt(0))) {
+				this.theDelimiter = "\\"+ str;
+				return ;
+			}
+		}
+		
+		StringBuffer retStr = new StringBuffer();
+		for (int i=0 ; i<str.length() ; i++) {
+			if ( isMetaChar(str.charAt(i))) {
+				retStr.append("\\");
+			}
+			retStr.append( str.charAt(i));
+		}
+		this.theDelimiter = retStr.toString();
 	}
 	/**
 	 * @return Returns the theLine.
