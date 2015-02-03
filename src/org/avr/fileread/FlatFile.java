@@ -2,16 +2,12 @@ package org.avr.fileread;
 
 import java.util.HashMap;
 
-import org.avr.fileread.records.DataRecord;
-import org.avr.fileread.records.Header;
-import org.avr.fileread.records.Trailer;
-
 /**
  * Contains all the record layouts for a specific file.
  * @author Alfonso
  *
  */
-public class FlatFile {
+class FlatFile {
 	
 	private Header header;
 	private Trailer trailer;

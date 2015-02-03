@@ -1,4 +1,4 @@
-package org.avr.fileread.records;
+package org.avr.fileread;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * @author Alfonso
  *
  */
-public interface IRecord {
+interface IRecord {
 
 	public String getClassName();
 	public List<Field> getFields();

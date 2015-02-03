@@ -1,4 +1,4 @@
-package org.avr.fileread.records;
+package org.avr.fileread;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author Alfonso
  *
  */
-public class MegaField extends Field implements IRecord {
+class MegaField extends Field implements IRecord {
 	
 	private String className;
 	private List<Field> fields = new ArrayList<Field>();

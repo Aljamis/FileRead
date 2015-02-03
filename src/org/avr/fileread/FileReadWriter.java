@@ -16,13 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.avr.fileread.exceptions.LayoutException;
-import org.avr.fileread.records.BasicRecord;
-import org.avr.fileread.records.DataRecord;
-import org.avr.fileread.records.Field;
-import org.avr.fileread.records.Header;
-import org.avr.fileread.records.IRecord;
-import org.avr.fileread.records.MegaField;
-import org.avr.fileread.records.Trailer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;

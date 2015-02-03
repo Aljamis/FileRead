@@ -1,11 +1,11 @@
-package org.avr.fileread.records;
+package org.avr.fileread;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.avr.fileread.exceptions.LayoutException;
 
-public abstract class BasicRecord implements IRecord {
+abstract class BasicRecord implements IRecord {
 	
 	private String className = "";
 	private String uid = "";			//  Unique record identifier
