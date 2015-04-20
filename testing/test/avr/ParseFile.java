@@ -4,6 +4,12 @@ import org.avr.Member;
 import org.avr.fileread.FileReadWriter;
 import org.avr.fileread.records.UnParsableRecord;
 
+
+/**
+ * Simple Read layout and parse a file
+ * @author Alfonso
+ *
+ */
 public class ParseFile {
 
 	public static void main(String[] args) {
