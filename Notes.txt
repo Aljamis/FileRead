@@ -1,0 +1,21 @@
+Megafield
+Megafield within Megafield
+
+
+
+Feb 22, 2016
+Multiple Record types (Header , M-Member , S-Spouse)
+*** if multiple record types each record type MUST BE  a different class
+
+
+   ________
+__/ TO DO  \____________________________________________________________
+Occurs multiple times.
+Write out file
+Read Excel  
+
+
+
+====  LIMITATIONS   ====================================================
+Delimited files can not have unique Identifiers.  ==> Can not have 
+multiple delimited records in the file. 
