@@ -67,7 +67,7 @@ public class FileReadWriter {
 			throw new LayoutException("Root element is <"+ rootEle.getNodeName() +"> !!! It should be <FileLayout>");
 		traverseRecords( rootEle.getChildNodes() );
 		
-		logger.debug( displayFields() );
+		logger.info( displayFields() );
 		
 		logger.info("Finished navigating DOM");
 	}
@@ -287,15 +287,32 @@ public class FileReadWriter {
 	
 	
 	
+	/**
+	 * Display all the records with their corresponding fields (including Header and Trailer).
+	 * @return
+	 */
 	public String displayFields() {
-		StringBuffer str = new StringBuffer();
+		StringBuffer str = new StringBuffer("\n");
 		
-		this.myDigester.getMyFileLayouts().getDataRecords();
+		// Display fields in the Header 
+		if (this.myDigester.getMyFileLayouts().getHeader() != null) {
+			Header hdr = this.myDigester.getMyFileLayouts().getHeader();
+			str.append( hdr.toString() );
+		}
+		
+		// Display all the record types
 		Set<String> keys = this.myDigester.getMyFileLayouts().getDataRecords().keySet();
 		for (String key : keys) {
 			DataRecord dr = this.myDigester.getMyFileLayouts().getDataRecords().get(key);
 			str.append( dr.toString() );
 		}
+		
+		// Display fields in the Trailer
+		if (this.myDigester.getMyFileLayouts().getTrailer() != null) {
+			Trailer trlr = this.myDigester.getMyFileLayouts().getTrailer();
+			str.append( trlr.toString() );
+		}
+		
 		return str.toString();
 	}
 	
@@ -310,6 +327,7 @@ public class FileReadWriter {
 		Path paths = FileSystems.getDefault().getPath( fileName );
 		try {
 			this.reader = Files.newBufferedReader( paths , Charset.defaultCharset() );
+			logger.info("FILE ["+ fileName +"] has been opened.");
 		} catch (IOException ioEx) {
 			logger.fatal("Could not open file: "+ fileName );
 			throw ioEx;

@@ -21,9 +21,6 @@ abstract class BasicRecord implements IRecord {
 	
 	public String getUid() { return uid; }
 	public void setUid(String uid) throws LayoutException {
-//		if (uid != null)
-//			if (uid.isEmpty()) uid = null;
-//			else this.uid = uid;
 		this.uid = uid;
 	}
 	
@@ -81,7 +78,7 @@ abstract class BasicRecord implements IRecord {
 	 */
 	private boolean validate() throws LayoutException {
 		if ( uid != null && !uid.isEmpty() ) {
-			if (uid.length() != ( 1+ uidEnd - uidStart )) {
+			if (uid.length() != ( uidEnd - uidStart )) {
 				throw new LayoutException(getClassName() +" UID will not fit between positions "+ uidStart +" and "+ uidEnd );
 			}
 			return true;

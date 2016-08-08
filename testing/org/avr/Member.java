@@ -9,6 +9,8 @@ public class Member {
 	private Address homeAddr;
 	private String email;
 	private Date dob;
+	
+	
 	public String getFirstName() {
 		return firstName;
 	}

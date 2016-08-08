@@ -1,5 +1,23 @@
 <FileLayout>
-	<record classname="org.avr.Member" delimiter="|">
+	<header classname="org.avr.MyHeader" uid="H" uidStart="0" uidEnd="1">
+		<field name="fileType" trim="true">
+			<type>String</type>
+			<start>2</start>
+			<end>11</end>
+		</field>
+		<field name="runDate" >
+			<type format="yyyyMMdd" >date</type>
+			<start>12</start>
+			<end>19</end>
+		</field>
+		<field name="recCount" trim="true" >
+			<type>int</type>
+			<start>20</start>
+			<end>30</end>
+		</field>
+	</header>
+	
+	<record classname="org.avr.Member" delimiter="|" >
 		<field name="firstName" trim="true" occurs="1">
 			<type>String</type>
 		</field>
@@ -37,6 +55,24 @@
 		<field name="dob" trim="false">
 			<type format="yyyyMMdd">date</type>
 		</field>
-		
 	</record>
+
+	<trailer classname="org.avr.MyTrailer" uid="TRLR" uidStart="0" uidEnd="4">
+		<field name="fileType" trim="true">
+			<type>String</type>
+			<start>5</start>
+			<end>14</end>
+		</field>
+		<field name="runDate" >
+			<type format="yyyyMMdd" >date</type>
+			<start>15</start>
+			<end>22</end>
+		</field>
+		<field name="recCount" trim="true" >
+			<type>int</type>
+			<start>23</start>
+			<end>33</end>
+		</field>
+	</trailer>
+
 </FileLayout>

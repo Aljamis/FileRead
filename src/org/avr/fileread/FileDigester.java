@@ -36,20 +36,14 @@ public class FileDigester {
 	 */
 	protected Object parseLine(String line ) {
 		if (myFileLayouts.getHeader() != null) {
-			Integer start = myFileLayouts.getHeader().getUidStart();
-			Integer end = myFileLayouts.getHeader().getUidEnd();
-			
-			if( ( line.substring( start , end) ).equalsIgnoreCase( myFileLayouts.getHeader().getUid() ) ) {
+			if( matchRecordType( line , myFileLayouts.getHeader() ) ) {
 				log.debug("Found a header record");
 				return parseHeader( line , myFileLayouts.getHeader() );
 			}
 		}
 		
 		if (myFileLayouts.getTrailer() != null) {
-			Integer start = myFileLayouts.getTrailer().getUidStart();
-			Integer end = myFileLayouts.getTrailer().getUidEnd();
-			
-			if( ( line.substring( start , end) ).equalsIgnoreCase( myFileLayouts.getTrailer().getUid() ) ) {
+			if( matchRecordType(line, myFileLayouts.getTrailer() )) {
 				log.debug("Found a trailer record");
 				return parseTrailer( line , myFileLayouts.getTrailer() );
 			}
@@ -59,38 +53,73 @@ public class FileDigester {
 			Set<String> keys = myFileLayouts.getDataRecords().keySet();
 			for (String key : keys) {
 				DataRecord rec = (DataRecord)myFileLayouts.getDataRecords().get( key );
-				Integer start = rec.getUidStart();
-				Integer end = rec.getUidEnd();
-				
-				if( ( line.substring( start , end) ).equalsIgnoreCase( rec.getUid() ) ) {
-					log.debug("Found a DATA record");
+				if( matchRecordType(line, rec) ) {
+					log.debug("Found a DATA record ["+ rec.getClassName() +"]");
 					return parseDataRec( line , rec );
 				}
 				
 			}
 		}
-		return new UnParsableRecord(line);
+		return new UnParsableRecord("Could not match a Recored" , line);
+	}
+	
+	
+	
+	/**
+	 * Look for the correct record type based on Unique ID and/or the number of delimited 
+	 * tokens in the line and the number of expected fields.
+	 * @param line
+	 * @param rec
+	 * @return
+	 */
+	private boolean matchRecordType(String line , BasicRecord rec) {
+		Integer start = rec.getUidStart();
+		Integer end = rec.getUidEnd();
+		
+		if( ( line.substring( start , end) ).equalsIgnoreCase( rec.getUid() ) ) {
+			return true;
+		}
+		return false;
 	}
 	
 	
 	
 	private Object parseHeader(String line, Header hdr) {
-		return null;
+		return parseDataRec(line, hdr);
 	}
 	private Object parseTrailer(String line, Trailer trlr) {
-		return null;
+		return parseDataRec(line , trlr);
 	}
 	private Object parseDataRec(String line, IRecord rec) {
-		if (rec.isDelimited())
+		if (rec.isDelimited() ) {
 			this.delimitedLine = new DelimitedLine( line , rec.getDelimiter());
+			/* TODO check line to make sure the number of tokens matches the number of fields */
+			if ( !lineIsDelimited(rec) ) {
+				return new UnParsableRecord("Number of tokens in the delimited line does not match the number of fields in the Record" , line);
+			}
+		}
 		
 		Object obj = instantiateRecord( rec.getClassName());
 		try {
 			parseFields( line , obj , rec );
 			return obj;
 		} catch (ParsingException pEx) {
-			return new UnParsableRecord( line );
+			return new UnParsableRecord( pEx.getMessage() , line );
 		}
+	}
+	
+	
+	
+	/**
+	 * In an effort to combine delimited records with fixed format records it is 
+	 * necessary to check if the line is, in fact  delimited.  If the number of tokens
+	 * does not match the number of fields in the record, then the line must be a 
+	 * different record.
+	 * @return
+	 */
+	private boolean lineIsDelimited( IRecord rec ) {
+		log.fatal( rec.getFields().size() +" - "+ delimitedLine.numOfTokens() );
+		return delimitedLine.numOfTokens() > rec.getFields().size(); 
 	}
 	
 	
@@ -265,7 +294,11 @@ public class FileDigester {
 			Date dt = sdf.parse(in);
 			return dt;
 		} catch (ParseException pEx) {
-			throw new ParsingException(fld.getName() +" does not match format ["+ fld.getFormat() +"]");
+			StringBuffer msg = new StringBuffer();
+			msg.append( fld.getName() ).append(" [").append(in).append("] does not match format [");
+			msg.append(fld.getFormat()).append("]");
+			log.error( msg.toString() );
+			throw new ParsingException(msg.toString());
 		}
 	}
 }
