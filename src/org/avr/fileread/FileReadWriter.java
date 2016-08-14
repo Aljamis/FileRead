@@ -1,6 +1,8 @@
 package org.avr.fileread;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
@@ -16,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.avr.fileread.exceptions.LayoutException;
+import org.avr.fileread.records.UnParsableRecord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -32,19 +35,44 @@ import org.xml.sax.SAXException;
 public class FileReadWriter {
 	private Logger logger = Logger.getLogger( FileReadWriter.class );
 	
+	private String layoutFileName;				//  The XML file storing the record layout
 	private Document myDOM;
 	private FileDigester myDigester = new FileDigester();
 	private BufferedReader reader = null;
 	
+	private BufferedWriter buffWriter;
+	private String outFileName = "";
+	public String getOutFileName() { return this.outFileName; }
+	public void setOutFileName(String out) { this.outFileName = out; }
+	
 	private AtomicInteger recordsRead = new AtomicInteger();
-		
+	
 	public FileReadWriter(String fileLayout , String fileName) throws ParserConfigurationException
 												, SAXException
 												, IOException
 												, LayoutException {
+		this.layoutFileName = fileLayout;
 		this.navigateDOM( fileLayout );
 		this.openFile( fileName );
 	}
+	
+	
+	/**
+	 * This constructor is exclusive to instantiating OUTPUT files.
+	 * @param fileLayout
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws LayoutException
+	 */
+	public FileReadWriter(String fileLayout ) throws ParserConfigurationException
+													, SAXException
+													, IOException
+													, LayoutException {
+		this.layoutFileName = fileLayout;
+		this.navigateDOM( fileLayout );
+	}
+	
 	
 	
 	/**
@@ -156,7 +184,7 @@ public class FileReadWriter {
 					rec.getFields().add( populateField( newEle ) );
 					break;
 				case "megaField":
-					rec.getFields().add( traverseMegaField( newEle ) );
+					rec.getFields().add( traverseMegaField(newEle , rec) );
 					break;
 				default:
 					throw new LayoutException(newEle.getNodeName() +" is not a valid field type (field, megaField)");
@@ -245,8 +273,9 @@ public class FileReadWriter {
 		}
 	}
 	
-	private Field traverseMegaField(Element ele) throws LayoutException{
+	private Field traverseMegaField(Element ele , IRecord rec) throws LayoutException{
 		MegaField megaF = new MegaField();
+		megaF.setDelimiter( rec.getDelimiter() );
 		megaF.setClassName( ele.getAttribute("classname") );
 		megaF.setName( ele.getAttribute("name"));
 		
@@ -350,6 +379,45 @@ public class FileReadWriter {
 			return myDigester.parseLine(line);
 		}
 		return null;
+	}
+	
+	
+	
+	
+	/**
+	 * Write Object to a FileLayout
+	 * @param obj
+	 * @throws IOException
+	 */
+	public void write (Object obj) throws IOException {
+		if (buffWriter == null)
+			createOutFile();
+		
+		String out = "";
+		if (obj instanceof UnParsableRecord) 
+			out = ((UnParsableRecord)obj).getLine();
+		else
+			out = myDigester.buildLine( obj );
+		
+		if (out == null) {
+			logger.warn("["+ layoutFileName +"] does not have a record for ["+ obj.getClass().getName() +"]");
+		} else {
+			this.buffWriter.write(out);
+			this.buffWriter.newLine();
+			this.buffWriter.flush();
+		}
+	}
+	
+	
+	
+	
+	/**
+	 * Create an OUT FILE to write to
+	 */
+	private void createOutFile() throws IOException {
+		if (this.outFileName == null || this.outFileName.trim().length() == 0)
+			throw new IOException("Output file has not been named");
+		this.buffWriter = new BufferedWriter( new FileWriter( this.outFileName) ) ;
 	}
 
 }

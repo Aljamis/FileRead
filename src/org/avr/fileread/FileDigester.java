@@ -2,11 +2,13 @@ package org.avr.fileread;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.avr.fileread.exceptions.ParsingException;
 import org.avr.fileread.records.UnParsableRecord;
@@ -65,6 +67,144 @@ public class FileDigester {
 	
 	
 	
+	
+	/**
+	 * Find the correct record layout for this class and pass to a method that
+	 * will build a string
+	 * @param obj
+	 * @return
+	 */
+	protected String buildLine (Object obj) {
+		BasicRecord rec = findFileLayout(obj);
+		if (rec == null) {
+			log.warn("Could not find a Record Layout for ["+ obj.getClass().getName() +"]");
+			return null;
+		}
+		
+		StringBuffer str = new StringBuffer();
+		if (rec.isDelimited())
+			return buildDelimited(obj , rec , str , true);
+		else {
+			/* Build an empty StringBuffer the MAX length of this record */
+			str.append( StringUtils.rightPad(" ", rec.getMaxLength() ) );
+			return buildFixedWidth( obj , rec , str );
+		}
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Look for a Record that matches the class type of the Object.
+	 * @param obj
+	 * @return
+	 */
+	private BasicRecord findFileLayout(Object obj) {
+		if (myFileLayouts.getHeader() != null) {
+			if (myFileLayouts.getHeader().getClassName().equals( obj.getClass().getName()))
+				return myFileLayouts.getHeader();
+		}
+		
+		if (myFileLayouts.getTrailer() != null) {
+			if(myFileLayouts.getTrailer().getClassName().equals( obj.getClass().getName() ))
+				return myFileLayouts.getTrailer();
+		}
+		
+		
+		return myFileLayouts.getDataRecords().get( obj.getClass().getName() );
+	}
+	
+	
+	
+	
+	
+	private String buildDelimited( Object obj , IRecord record , StringBuffer str , boolean firstToken ) {
+		for (Field field : record.getFields()) {
+			log.debug("Building from field ["+ field.getName() +"]");
+			
+			if (field instanceof MegaField) {
+				Object newObj = getMemberVariable( obj , field );
+				buildDelimited( newObj, (MegaField) field, str , firstToken );
+				firstToken = false;
+				continue;
+			}
+			
+			String methodName = "get"+ field.getName().substring(0, 1).toUpperCase();
+			methodName += field.getName().substring(1);
+			
+			try {
+				Class<?> c = obj.getClass();
+				Method m = c.getMethod( methodName );
+				
+				/* DELIMITER only after the  */
+				if ( !firstToken ) str.append( record.getDelimiter() );
+				str.append( padFormatField(field, obj, m.invoke( obj )));
+			} catch (NoSuchMethodException nsmEx) {
+				log.error("Field ["+ field +"]" , nsmEx);
+			} catch (InvocationTargetException itEx) {
+				log.error("", itEx);
+			} catch (IllegalAccessException iaEx) {
+				log.error(""  , iaEx );
+			}
+			firstToken = false;
+		}
+		
+		if(record.getUid() != null  &&  !"".equals(record.getUid())) {
+			str.replace( record.getUidStart() , record.getUidEnd(), record.getUid() );
+		}
+		
+		return str.toString();
+	}
+	
+	
+	
+	
+	/**
+	 * Build string line from the Object using Fields in the Record
+	 * @param obj
+	 * @param record
+	 * @param str
+	 * @return
+	 */
+	private String buildFixedWidth( Object obj , IRecord record , StringBuffer str ) {
+		for (Field field : record.getFields()) {
+			log.debug("Building from field ["+ field.getName() +"]");
+			
+			if (field instanceof MegaField) {
+				Object newObj = getMemberVariable( obj , field );
+				buildFixedWidth( newObj, (MegaField) field, str);
+				continue;
+			}
+			
+			String methodName = "get"+ field.getName().substring(0, 1).toUpperCase();
+			methodName += field.getName().substring(1);
+			
+			try {
+				Class<?> c = obj.getClass();
+				Method m = c.getMethod( methodName );
+				
+				str.replace( field.getStart() -1 , field.getEnd() , padFormatField(field, obj, m.invoke( obj )));
+			} catch (NoSuchMethodException nsmEx) {
+				log.error("Field ["+ field +"]" , nsmEx);
+			} catch (InvocationTargetException itEx) {
+				log.error("", itEx);
+			} catch (IllegalAccessException iaEx) {
+				log.error(""  , iaEx );
+			}
+		}
+		
+		if(record.getUid() != null  &&  !"".equals(record.getUid())) {
+			str.replace( record.getUidStart() , record.getUidEnd(), record.getUid() );
+		}
+		
+		return str.toString();
+	}
+	
+	
+	
+	
+	
 	/**
 	 * Look for the correct record type based on Unique ID and/or the number of delimited 
 	 * tokens in the line and the number of expected fields.
@@ -118,7 +258,7 @@ public class FileDigester {
 	 * @return
 	 */
 	private boolean lineIsDelimited( IRecord rec ) {
-		log.fatal( rec.getFields().size() +" - "+ delimitedLine.numOfTokens() );
+		log.debug( "Record has "+ rec.getFields().size() +" fields      The line has "+ delimitedLine.numOfTokens() +" tokens.");
 		return delimitedLine.numOfTokens() > rec.getFields().size(); 
 	}
 	
@@ -203,6 +343,15 @@ public class FileDigester {
 	}
 	
 	
+	
+	
+	
+	/**
+	 * Set the member variable in the obj by calling it's setMemberVariableName()
+	 * @param obj
+	 * @param dataField
+	 * @param fld
+	 */
 	private void setMemberVariable( Object obj , Object dataField , Field fld ) {
 		String methodName = "set"+ fld.getName().substring(0,1).toUpperCase();
 		methodName += fld.getName().substring(1);
@@ -216,9 +365,30 @@ public class FileDigester {
 		} catch (IllegalAccessException iaEx) {
 			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
 		}
-		
-		catch (NullPointerException npEx) {
-			System.out.println( fld +"  "+ methodName);
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Get the object/variable from the obj's getMemberVariableName()
+	 * @param obj
+	 * @param fld
+	 * @return
+	 */
+	private Object getMemberVariable(Object obj , Field fld) {
+		String methodName = "get"+ fld.getName().substring(0,1).toUpperCase();
+		methodName += fld.getName().substring(1);
+		try {
+			Method m = obj.getClass().getMethod( methodName );
+			return m.invoke(obj);
+		} catch (NoSuchMethodException nsmEx) {
+			throw new ParsingException(methodName +" does not exist");
+		} catch (InvocationTargetException itEx) {
+			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName());
+		} catch (IllegalAccessException iaEx) {
+			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
 		}
 	}
 	
@@ -301,4 +471,58 @@ public class FileDigester {
 			throw new ParsingException(msg.toString());
 		}
 	}
+	
+	
+	
+	
+	/**
+	 * Convert Date object to its FORMATTED representation.
+	 * @param format
+	 * @param dt
+	 * @return
+	 */
+	private String dateToString(String format , Date dt) {
+		SimpleDateFormat sdf = new SimpleDateFormat( format );
+		return sdf.format( dt );
+	}
+	
+	
+	
+	
+	/**
+	 * 
+	 * @param fld
+	 * @param obj
+	 * @param target
+	 * @return
+	 */
+	private String padFormatField( Field field , Object obj , Object x) {
+		StringBuffer strBuff = new StringBuffer();
+		if (x instanceof String) {
+			/* Append spaces to END */
+			strBuff.append(x);
+			while (strBuff.length() <= field.getEnd() - field.getStart() ) {
+				strBuff.append(" ");
+			}
+		} else if (x instanceof Integer) {
+			/* Prefix spaces to the beginning */
+			strBuff.append( x );
+			while (strBuff.length() <= field.getEnd() - field.getStart() ) {
+				strBuff.insert(0, " ");
+			}
+		} else if (x instanceof Double) {
+			DecimalFormat df = new DecimalFormat( field.getFormat() );
+			
+			strBuff.append( df.format((Double)x) );
+			while (strBuff.length() <= field.getEnd() - field.getStart() ) {
+				strBuff.insert(0, " ");
+			}
+		} else if (x instanceof Date) {
+			strBuff.append( dateToString(field.getFormat(), (Date)x ));
+			while (strBuff.length() <= field.getEnd() - field.getStart() ) {
+				strBuff.append(" ");
+			}
+		}
+		return strBuff.toString();
+	}	
 }

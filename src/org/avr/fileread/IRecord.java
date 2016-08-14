@@ -15,4 +15,8 @@ interface IRecord {
 	public boolean isDelimited();
 	public String getDelimiter();
 	
+	public int getMaxLength();
+	public String getUid();
+	public Integer getUidStart();
+	public Integer getUidEnd();
 }

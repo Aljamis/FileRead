@@ -14,6 +14,7 @@ abstract class BasicRecord implements IRecord {
 	private List<Field> fields = new ArrayList<Field>();
 	private boolean delimited = false;
 	private String delimiter = "";
+	private int maxRecordLength=0;
 	
 	
 	public String getClassName() { return className; }
@@ -44,12 +45,40 @@ abstract class BasicRecord implements IRecord {
 	public void setDelimiter(String d) { this.delimiter = d; }
 	
 	
+	/**
+	 * Calculate the MAX length of the record iterating through the fields looking for
+	 * the field with the greatest getEnd()
+	 * @return
+	 */
+	public int getMaxRecordLength(List<Field> myFields , int maxEnd) { 
+		for (Field field : myFields) {
+			if (field instanceof MegaField) {
+				maxEnd = getMaxRecordLength( ((MegaField)field).getFields() , maxEnd);
+				continue;
+			}
+			
+			if(field.getEnd() > maxEnd) {
+				int occurances = 0;
+				if( field.getOccurs() > 1 ) {
+					occurances = ( (field.getOccurs() -1) * (field.getEnd() - field.getStart()) );
+				}
+				maxEnd = field.getEnd() + occurances;
+			}
+		}
+		this.setMaxRecordLength( maxEnd );
+		
+		return maxRecordLength;
+	}
+	public void setMaxRecordLength(int maxRecordLength) { this.maxRecordLength = maxRecordLength; }
+	
+	
+	
 	public String toString() {
 		StringBuffer str = new StringBuffer();
 		str.append("["+ this.getClass().getSimpleName() +"]  "+ this.getClassName() ); 
 		
 		if ( !this.getUid().isEmpty() ) {
-			str.append("\t delimiter [").append( getUid() ).append("]  start [");
+			str.append("\t UID [").append( getUid() ).append("]  start [");
 			str.append( getUidStart() ).append("]   end [").append( getUidEnd() ).append("]");
 		}
 		
@@ -102,5 +131,17 @@ abstract class BasicRecord implements IRecord {
 		if ( uid == null && uidStart == null && uidEnd == null )
 			return true;
 		return validate();
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Return the maximum length of this record
+	 */
+	public int getMaxLength() {
+		
+		return this.getMaxRecordLength( fields , 0);
 	}
 }

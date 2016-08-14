@@ -61,8 +61,30 @@ class MegaField extends Field implements IRecord {
 				str.append("occurs [").append( field.getOccurs() ).append("] ");
 			str.append('\n');
 		}
-}
+	}
 		
 		return str.toString();
+	}
+	
+	
+	
+	/**
+	 * MegaField should not need to return this - therefore return 0.
+	 */
+	@Override
+	public int getMaxLength() {
+		return 0;
+	}
+	@Override
+	public String getUid() {
+		return null;
+	}
+	@Override
+	public Integer getUidStart() {
+		return null;
+	}
+	@Override
+	public Integer getUidEnd() {
+		return null;
 	}
 }
