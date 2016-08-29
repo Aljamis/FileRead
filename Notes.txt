@@ -8,10 +8,13 @@ Multiple Record types (Header , M-Member , S-Spouse)
 *** if multiple record types each record type MUST BE  a different class
 
 
+Aug 13, 2016
+Write out file
+
+
    ________
 __/ TO DO  \____________________________________________________________
 Occurs multiple times.
-Write out file
 Read Excel  
 
 
