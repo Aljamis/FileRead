@@ -259,7 +259,8 @@ public class FileDigester {
 	 */
 	private boolean lineIsDelimited( IRecord rec ) {
 		log.debug( "Record has "+ rec.getFields().size() +" fields      The line has "+ delimitedLine.numOfTokens() +" tokens.");
-		return delimitedLine.numOfTokens() > rec.getFields().size(); 
+		/* I thought this was wrong ..  >=  .. i'm sure I changed this before.  */
+		return delimitedLine.numOfTokens() >= rec.getFields().size(); 
 	}
 	
 	
