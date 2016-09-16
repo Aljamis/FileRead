@@ -17,8 +17,9 @@ __/ TO DO  \____________________________________________________________
 Occurs multiple times.
 Read Excel  
 
+" " (space) is NOT a valid delimiter 
 
 
 ====  LIMITATIONS   ====================================================
 Delimited files can not have unique Identifiers.  ==> Can not have 
-multiple delimited records in the file. 
+multiple delimited records in the file.
