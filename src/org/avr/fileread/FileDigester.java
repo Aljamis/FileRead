@@ -2,6 +2,7 @@ package org.avr.fileread;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -241,7 +242,6 @@ public class FileDigester {
 	private Object parseDataRec(String line, IRecord rec) {
 		if (rec.isDelimited() ) {
 			this.delimitedLine = new DelimitedLine( line , rec.getDelimiter());
-			/* TODO check line to make sure the number of tokens matches the number of fields */
 			if ( !lineIsDelimited(rec) ) {
 				return new UnParsableRecord("Number of tokens in the delimited line does not match the number of fields in the Record" , line);
 			}
@@ -267,7 +267,8 @@ public class FileDigester {
 	 */
 	private boolean lineIsDelimited( IRecord rec ) {
 		log.debug( "Record has "+ rec.getFields().size() +" fields      The line has "+ delimitedLine.numOfTokens() +" tokens.");
-		return delimitedLine.numOfTokens() > rec.getFields().size(); 
+		/* I thought this was wrong ..  >=  .. i'm sure I changed this before.  */
+		return delimitedLine.numOfTokens() >= rec.getFields().size(); 
 	}
 	
 	
@@ -333,17 +334,14 @@ public class FileDigester {
 		case "String":
 			return prelimField;
 
-		case "int":
-			return intField(prelimField , fld.getName());
+		case "BigDecimal":
+			return bigDecimalField(prelimField, fld.getName());
 
-		case "double":
-			return doubleField(prelimField, fld.getName());
-
-		case "date":
+		case "Date":
 			return dateField(prelimField , fld);
 
 		default:
-			log.error("Field Type ["+ fld.getType() +"] is not a valid type (String, int, double, date).");
+			log.error("Field Type ["+ fld.getType() +"] is not a valid type (String, BigDecimal, Date).");
 			break;
 		}
 		
@@ -367,10 +365,13 @@ public class FileDigester {
 			Method m = obj.getClass().getMethod( methodName , new Class[] { dataField.getClass() } );
 			m.invoke(obj, dataField);
 		} catch (NoSuchMethodException nsmEx) {
+			log.fatal(methodName +"( "+ dataField.getClass().getName() +" ) does not exist");
 			throw new ParsingException(methodName +" does not exist");
 		} catch (InvocationTargetException itEx) {
+			log.fatal("Could not invoke "+ methodName +" on field "+ fld.getName());
 			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName());
 		} catch (IllegalAccessException iaEx) {
+			log.fatal("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
 			throw new ParsingException("Could not invoke "+ methodName +" on field "+ fld.getName() +" : IllegalAccess Exception.");
 		}
 	}
@@ -422,38 +423,19 @@ public class FileDigester {
 	
 	
 	/**
-	 * Turn the string from the file record into an Integer. Otherwise, throw
+	 * Turn the string from the file record into a BigDecimal.  Otherwise, throw
 	 * a RunTimeException:  ParsingException.
 	 * @param in
 	 * @param fldName
 	 * @return
 	 */
-	private Integer intField(String in , String fldName) {
+	private BigDecimal bigDecimalField(String in , String fldName) {
 		try {
-			Integer ingr = new Integer(in);
-			return ingr;
+			BigDecimal bd = new BigDecimal(in);
+			return bd;
 		} catch (NumberFormatException nfEx) {
-			log.error("["+ fldName +"] is not an Integer : "+ in );
-			throw new ParsingException("["+ fldName +"] is not an Integer : "+ in );
-		}
-	}
-	
-	
-	
-	/**
-	 * Turn the string from the file record into a Double.  Otherwise, throw
-	 * a RunTimeException:  ParsingException.
-	 * @param in
-	 * @param fldName
-	 * @return
-	 */
-	private Double doubleField(String in , String fldName) {
-		try {
-			Double dbl = new Double(in);
-			return dbl;
-		} catch (NumberFormatException nfEx) {
-			log.error("["+ fldName +"] is not a Double : "+ in );
-			throw new ParsingException("["+ fldName +"] is not a Double: "+ in );
+			log.error("["+ fldName +"] is not a number : "+ in );
+			throw new ParsingException("["+ fldName +"] is not a number: "+ in );
 		}
 	}
 	

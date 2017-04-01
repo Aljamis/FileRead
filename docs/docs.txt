@@ -1,0 +1,344 @@
+
+  ______ _ _      _____                _           __          __   _ _        
+ |  ____(_) |    |  __ \              | |   ___    \ \        / /  (_) |       
+ | |__   _| | ___| |__) |___  __ _  __| |  ( _ )    \ \  /\  / / __ _| |_ ___  
+ |  __| | | |/ _ \  _  // _ \/ _` |/ _` |  / _ \/\   \ \/  \/ / '__| | __/ _ \ 
+ | |    | | |  __/ | \ \  __/ (_| | (_| | | (_>  <    \  /\  /| |  | | ||  __/ 
+ |_|    |_|_|\___|_|  \_\___|\__,_|\__,_|  \___/\/     \/  \/ |_|  |_|\__\___| 
+                                                                               
+                                                                               
+
+
+
+
+Before coding can begin 3 things must be established:
+
+  1)  The file layout.
+  2)  A Plain Old Java Object (POJO) to map to.
+  3)  An XML document identifing the POJO and fields
+      being mapped to it.
+
+
+1) Example file layout
+   Field name        Start At    Length
+   ===============   ========    ====== 
+   First name            1         20
+   Last name            21         20
+   SSN                  41          9
+   Address line 1       50         30
+   Address line 2       80         30
+   City                110         25
+   State               135          2
+   Zip                 137          5
+   Zip4                142          4
+
+
+2) Define your POJO
+   public class Member {
+	   
+       private String firstName;
+       private String lastName;
+       private String ssn;
+       private String addrLine1;
+       private String addrLine2;
+       private String city;
+       private String state;
+       private String zip;
+       private String zip4;
+	...
+	
+The POJO must include getters and setters for each field defined in your file layout.
+
+
+3) Now for the part that binds the file layout to each field in the POJO.  An XML file 
+with <FileLayout> as the root and <record> defining each individual layout corresponding
+to a POJO.  Each <record> will have mutiple <field>'s associated.  It is these individual
+fields that map back to a member variable in the POJO.
+
+<FileLayout>
+	<record classname="test.avr.pojo.Member" uid="">
+		<field name="firstName" trim="true">
+			<type>String</type>
+			<start>1</start>
+			<end>20</end>
+		</field>
+		<field name="lastName">
+			<type>String</type>
+			<start>21</start>
+			<end>40</end>
+		</field>
+		<field name="ssn">
+			<type>String</type>
+			<start>41</start>
+			<end>50</end>
+		</field>
+		<field name="addrLine1">
+			<type>String</type>
+			<start>51</start>
+			<end>79</end>
+		</field>
+		<field name="addrLine2">
+			<type>String</type>
+			<start>80</start>
+			<end>109</end>
+		</field>
+		<field name="city">
+			<type>String</type>
+			<start>110</start>
+			<end>134</end>
+		</field>
+		<field name="state">
+			<type>String</type>
+			<start>135</start>
+			<end>136</end>
+		</field>
+		<field name="zip">
+			<type>String</type>
+			<start>137</start>
+			<end>141</end>
+		</field>
+		<field name="zip4">
+			<type>String</type>
+			<start>142</start>
+			<end>145</end>
+		</field>
+	</record>
+</FileLayout>
+
+Every <FileLayout> can have multiple <record>s.  Header and Trailer records are
+identified uniquely.  However there could be multple record types in a file.  You could
+have an order record followed by multiple item records.  You could have a file with
+Subscriber records and Dependent records.  The point is for a single <FileLayout> can
+consist of various <record>s.
+
+A <record> ties directly to a POJO by the "classname" attribute.  This must be a fully
+qualified class name.  "uid" is an optional parameter indicating a string that is used
+to identify this <record> type for other <record> types in the <FileLayout>.
+
+Each <record> will have multiple <field> elements.  These <fields> correspond directly
+with the member variables of POJO.  There is 1 required attribute and 1 optional.  
+"name" is the required attribute.  It must identically match the member variable name in
+the POJO.  These are case sensitive.  "trim" is the optional attribute and it defaults to
+false.  It will trim leading and trailing spaces.
+
+If a file is fixed width, 3 elements are required within <field>.  <type> must match the 
+type of variable.  At this time only java.lang.String, java.util.Date and 
+java.math.BigDecimal are permitted.  These are further described in the Data Types 
+section of this document.  The only attribute allowed is "format" which provides a means 
+to parse a date using java.text.SimpleDateFormat conventions.
+
+<start> and <end> indicate the starting and ending positions of the field in the fixed 
+width file.
+
+If a file has a delimiter separating the fields the <start> and <end> tags can be 
+omitted.  <type> is still a required element.
+
+<FileLayout>
+	<record classname="test.avr.pojo.Member" uid="" delimiter="~">
+		<field name="firstName" trim="true">
+			<type>String</type>
+		</field>
+		<field name="lastName">
+			<type>String</type>
+		</field>
+		<field name="ssn">
+			<type>String</type>
+		</field>
+		<field name="addrLine1">
+			<type>String</type>
+		</field>
+		<field name="addrLine2">
+			<type>String</type>
+		</field>
+		<field name="city">
+			<type>String</type>
+		</field>
+		<field name="state">
+			<type>String</type>
+		</field>
+		<field name="zip">
+			<type>String</type>
+		</field>
+		<field name="zip4">
+			<type>String</type>
+		</field>
+	</record>
+</FileLayout>
+
+
+
+
+
+
+
+One of benefits of this framework/design is the decoupling of file layout from file 
+processing.  Business logic can remain static while file layouts are modified.  It is
+also possible to retain the same business logic and process files with various layouts.
+The only change necessary would be to the xml file defining the layout.  Here is a 
+sample of code using the layout and POJO listed above:
+
+    	try {
+    		FileReadWriter readFile = new FileReadWriter("MyTestLayout.xml", "data/People");
+    		
+    		Object obj = null;
+    		while ( (obj = readFile.readNextLine()) != null ) {
+    			if (obj instanceof Member) {
+    				Member mbr = (Member) obj;
+    				System.out.println( mbr );
+    			}
+    		}
+    	} catch (ParserConfigurationException | SAXException | IOException | LayoutException e) {
+    		e.printStackTrace();
+    	}
+
+
+That's it.
+1)  Instantiate a FileReadWriter passing it the file layout XML and the file name to read.
+2)  readNextLine() until there are no more lines to read.
+
+
+
+
+
+        
+        
+  __  __                  ______ _      _     _  
+ |  \/  |                |  ____(_)    | |   | | 
+ | \  / | ___  __ _  __ _| |__   _  ___| | __| | 
+ | |\/| |/ _ \/ _` |/ _` |  __| | |/ _ \ |/ _` | 
+ | |  | |  __/ (_| | (_| | |    | |  __/ | (_| | 
+ |_|  |_|\___|\__, |\__,_|_|    |_|\___|_|\__,_| 
+               __/ |                             
+              |___/                              
+
+.___  ___.  _______   _______      ___       _______  __   _______  __       _______  
+|   \/   | |   ____| /  _____|    /   \     |   ____||  | |   ____||  |     |       \ 
+|  \  /  | |  |__   |  |  __     /  ^  \    |  |__   |  | |  |__   |  |     |  .--.  |
+|  |\/|  | |   __|  |  | |_ |   /  /_\  \   |   __|  |  | |   __|  |  |     |  |  |  |
+|  |  |  | |  |____ |  |__| |  /  _____  \  |  |     |  | |  |____ |  `----.|  '--'  |
+|__|  |__| |_______| \______| /__/     \__\ |__|     |__| |_______||_______||_______/ 
+                                                                                      
+
+  __  __                  _____ _      _     _ 
+ |  \/  | ___  __ _  __ _|  ___(_) ___| | __| |
+ | |\/| |/ _ \/ _` |/ _` | |_  | |/ _ \ |/ _` |
+ | |  | |  __/ (_| | (_| |  _| | |  __/ | (_| |
+ |_|  |_|\___|\__, |\__,_|_|   |_|\___|_|\__,_|
+              |___/                            
+
+
+What is a MegaField?  Simple.  Class member variables that are classes themselves.  Taking 
+our Member class above, lets make some adjustments: 
+
+   public class Member {
+	   
+       private String firstName;
+       private String lastName;
+       private String ssn;
+       private MemberAddress homeAddr;
+	...
+
+   public class MemberAddress {
+	   
+       private String addrLine1;
+       private String addrLine2;
+       private String city;
+       private String state;
+       private ZipCode zip;
+	...
+	
+	public class ZipCode {
+       
+       private String zip;
+       private String zip4;
+	...
+
+All of the Address fields have been moved into a new class named MemberAddress.  In 
+addition zip code has been moved into its own class.  This is simply to illustrate the
+unlimited nesting potential of the megaField.  Once again each POJO must include getters
+and setters for each field defined in your file layout.  The <FileLayout> will look like
+this:
+
+    <FileLayout>
+    	<record classname="test.avr.pojo.Member" uid="" delimiter="~">
+    		<field name="firstName" trim="true">
+    			<type>String</type>
+    		</field>
+    		<field name="lastName">
+    			<type>String</type>
+    		</field>
+    		<field name="ssn">
+    			<type>String</type>
+    		</field>
+    		
+    		<megaField name="homeAddr" classname="test.avr.pojo.MemberAddress">
+    			<field name="addrLine1"> <type>String</type> </field>
+    			<field name="addrLine2"> <type>String</type> </field>
+    			<field name="city"> <type>String</type> </field>
+    			<field name="state"> <type>String</type> </field>
+    			
+    			<megaField name="zip" classname="test.avr.pojo.ZipCode">
+    				<field name="zip"> <type>String</type> </field>
+    				<field name="zip4"> <type>String</type> </field>
+    			</megaField>
+    			
+    		</megaField>
+    		
+    	</record>
+    </FileLayout>
+
+
+The code to read this file will be identical to the previous example. 
+
+
+
+
+
+
+
+  _____        _          _______                     
+ |  __ \      | |        |__   __|                    
+ | |  | | __ _| |_ __ _     | |_   _ _ __   ___  ___  
+ | |  | |/ _` | __/ _` |    | | | | | '_ \ / _ \/ __| 
+ | |__| | (_| | || (_| |    | | |_| | |_) |  __/\__ \ 
+ |_____/ \__,_|\__\__,_|    |_|\__, | .__/ \___||___/ 
+                                __/ | |               
+                               |___/|_|               
+
+
+There are 3 data types used in this module:
+
+      String          java.lang.String
+      BigDecimal      java.math.BigDecimal
+      Date            java.util.Date
+
+Date is the only field  permitted to have an attribute associated with it.  As stated
+before this is used to define the format.  Is uses java.text.SimpleDateFormat formatting.
+
+BigDecimal is used over Double, Float and Integer for the simple fact of it being 
+floating-point and the inevitable inaccuracy often related with floating-point in Java.
+
+
+
+
+
+
+
+
+
+   _____                _                _____                    
+  / ____|              (_)              / ____|                   
+ | |     ___  _ __ ___  _ _ __   __ _  | (___   ___   ___  _ __   
+ | |    / _ \| '_ ` _ \| | '_ \ / _` |  \___ \ / _ \ / _ \| '_ \  
+ | |___| (_) | | | | | | | | | | (_| |  ____) | (_) | (_) | | | | 
+  \_____\___/|_| |_| |_|_|_| |_|\__, | |_____/ \___/ \___/|_| |_| 
+                                 __/ |                            
+                                |___/                             
+
+- A JavaFX GUI to assist in generating POJO and XML files.  Because Swing is so difficult 
+  to work with.
+- A .Net GUI to assist in generating POJO and XML files.  Only because I want to play with
+  Visual Studio.
+- A .Net version.  But first I would need to understand why batch processing is occurring
+  outside of a *nix environment.  Convince me.
+

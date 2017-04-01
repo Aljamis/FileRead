@@ -1,0 +1,49 @@
+<project name="FileReadWrite" basedir=".">
+
+	<!--   Replace this with your location of dependent files -->
+	<property name="lib.dir" value="lib"/>
+	 
+	<property name="appName" value="FileReadWrite"/>
+	<property name="buildDir" value="deploy/build"/>
+	
+	
+	
+	<!--Global classpath including all the jar files in the lib directory-->
+	<path id="class.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+
+	<target name="TestAnt" description="Test Ant is working">
+		<echo message="BOO" />
+	</target>
+	
+	
+	<target name="deployClean" description="Removes all generated files.">
+		<echo message="Cleaning your previous deployment" />
+		<delete dir="deploy"/>
+	</target>
+	
+	<target name="deployPrep" description="Prepare file structure for UNIX deployment.">
+		<mkdir dir="${buildDir}"/>
+	</target>
+	
+	<target name="compile">
+		<javac includeantruntime="false" srcdir="src" destdir="${buildDir}" fork="yes" debug="on">
+			<classpath refid="class.path"/>
+		</javac>
+	</target>
+	
+	<target name="deployJAR"  description="Generates jar.">
+		<jar destfile="deploy/${appName}.jar">
+			<fileset dir="${buildDir}" includes="**/*.class"/>
+		</jar>
+		
+		<delete dir="${buildDir}"/>
+	</target>
+	
+	
+	
+</project>

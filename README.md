@@ -1,0 +1,2 @@
+# FileRead
+All Big-E (Enterprise) applications have, at some point, file processing.  Reading and writing raw files.  This project provides a framework to read raw data files into POJOs.  Files can be fixed length or delimited **(By anything other than an empty space)**.
