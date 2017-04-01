@@ -213,13 +213,21 @@ public class FileDigester {
 	 * @return
 	 */
 	private boolean matchRecordType(String line , BasicRecord rec) {
-		Integer start = rec.getUidStart();
-		Integer end = rec.getUidEnd();
-		
-		if( ( line.substring( start , end) ).equalsIgnoreCase( rec.getUid() ) ) {
-			return true;
+		if ( rec.isDelimited() && (rec.getUid() != null && rec.getUid().trim().length() > 0 ) ) {
+			DelimitedLine deliLine = new DelimitedLine( line , rec.getDelimiter());
+			if ( rec.getUid().equalsIgnoreCase( deliLine.getTheTokens()[ rec.getUidStart()] ) ) {
+				return true;
+			}
+			return false;
+		} else {
+			Integer start = rec.getUidStart();
+			Integer end = rec.getUidEnd();
+			
+			if( ( line.substring( start , end) ).equalsIgnoreCase( rec.getUid() ) ) {
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 	
 	
