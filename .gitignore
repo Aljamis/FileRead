@@ -1,11 +1,7 @@
-<<<<<<< HEAD
 bin/
-testing
-=======
-/bin/
-.classpath
-.project
-.settings/
 testing/
-deploy/
->>>>>>> refs/remotes/origin/master
+.settings/
+
+.project
+.classpath
+Notes.txt
