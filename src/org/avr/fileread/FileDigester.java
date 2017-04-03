@@ -37,6 +37,7 @@ public class FileDigester {
 	 * @return
 	 */
 	protected Object parseLine(String line ) {
+		this.delimitedLine = null; /* RESET THIS !! */
 		if (myFileLayouts.getHeader() != null) {
 			if( matchRecordType( line , myFileLayouts.getHeader() ) ) {
 				log.debug("Found a header record");
@@ -215,6 +216,7 @@ public class FileDigester {
 	private boolean matchRecordType(String line , BasicRecord rec) {
 		if ( rec.isDelimited() && (rec.getUid() != null && rec.getUid().trim().length() > 0 ) ) {
 			DelimitedLine deliLine = new DelimitedLine( line , rec.getDelimiter());
+			if (rec.getNumberOfFields() != deliLine.numOfTokens() ) return false;
 			if ( rec.getUid().equalsIgnoreCase( deliLine.getTheTokens()[ rec.getUidStart()] ) ) {
 				return true;
 			}

@@ -12,7 +12,6 @@ abstract class BasicRecord implements IRecord {
 	private Integer uidStart = null;
 	private Integer uidEnd = null;
 	private List<Field> fields = new ArrayList<Field>();
-	private boolean delimited = false;
 	private String delimiter = "";
 	private int maxRecordLength=0;
 	
@@ -143,5 +142,28 @@ abstract class BasicRecord implements IRecord {
 	public int getMaxLength() {
 		
 		return this.getMaxRecordLength( fields , 0);
+	}
+	
+	
+	
+	private int numberOfFields=0;
+	/**
+	 * Use this to compare to with the number of delimited tokens found in a 
+	 * from the line.
+	 * @return
+	 */
+	public int getNumberOfFields() {
+		if (numberOfFields == 0)
+			countFields(this.getFields());
+		return numberOfFields;
+	}
+	private void countFields(List<Field> flds) {
+		for (Field field : flds) {
+			if (field instanceof MegaField) {
+				countFields( ((MegaField)field).getFields() );
+			} else {
+				numberOfFields++;
+			}
+		}
 	}
 }
