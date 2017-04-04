@@ -131,7 +131,8 @@ public class FileReadWriter {
 					 */
 					DataRecord dataRec = new DataRecord();
 					populateRecord( dataRec , newEle );
-					myDigester.getMyFileLayouts().getDataRecords().put( dataRec.getClassName() , dataRec );
+//					myDigester.getMyFileLayouts().getDataRecords().put( dataRec.getClassName() , dataRec );
+					addRecordLayout(dataRec);
 					break;
 				default:
 					throw new LayoutException( newEle.getNodeName() +" is not a valid Record type (header, trailer or record).");
@@ -419,5 +420,21 @@ public class FileReadWriter {
 			throw new IOException("Output file has not been named");
 		this.buffWriter = new BufferedWriter( new FileWriter( this.outFileName) ) ;
 	}
-
+	
+	
+	
+	
+	/**
+	 * Adds the new record layout to the collection of layouts.  The collection is a
+	 * HashMap of DataRecord's with ClassName being the key.  A LayoutException is 
+	 * thrown if 2 layouts are defined for the same ClassName.
+	 *  
+	 * @param dataRec
+	 * @throws LayoutException
+	 */
+	private void addRecordLayout(DataRecord dataRec) throws LayoutException {
+		if ( myDigester.getMyFileLayouts().getDataRecords().get( dataRec.getClassName() ) != null )
+			throw new LayoutException("["+ dataRec.getClassName() +"] already exists as a layout.  Must use a different ClassName.");
+		myDigester.getMyFileLayouts().getDataRecords().put( dataRec.getClassName() , dataRec );
+	}
 }
