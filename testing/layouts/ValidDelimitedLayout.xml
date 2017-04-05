@@ -1,0 +1,30 @@
+<!DOCTYPE FileLayout [
+	<!ELEMENT record (field)+>
+	<!ELEMENT field (type , start? , end?)>
+	
+	<!ATTLIST record classname CDATA #REQUIRED>
+	<!ATTLIST record delimiter CDATA #IMPLIED >
+	<!ATTLIST record uid CDATA #IMPLIED >
+	<!ATTLIST record uidStart CDATA #IMPLIED >
+	<!ATTLIST record uidEnd CDATA #IMPLIED >
+	
+	<!ATTLIST field name CDATA "check">
+	<!ATTLIST field trim CDATA "check">
+	<!ATTLIST field occurs CDATA #IMPLIED>
+	
+	<!ATTLIST type format CDATA #IMPLIED>
+]>
+<FileLayout>
+	<record classname="test.avr.TeamSched" delimiter=";">
+		<field name="row" trim="true">
+			<type>String</type>
+		</field>
+		<field name="ourScore" >
+			<type>String</type>
+		</field>
+		<field name="opponentScore" >
+			<type>String</type>
+		</field>
+ 
+	</record>
+</FileLayout>

@@ -1,0 +1,14 @@
+<!DOCTYPE xml>
+<FileLayout>
+	<record classname="test.avr.TeamSched" uid="" delimiter=";">
+		<field name="row" trim="true">
+			<type>String</type>
+		</field>
+		<field name="ourScore" >
+		</field>
+		<field name="opponentScore" >
+			<type>String</type>
+		</field>
+ 
+	</record>
+</FileLayout>

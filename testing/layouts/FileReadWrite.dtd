@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!ELEMENT FileLayout (header? , record+ trailer?)>
+<!ELEMENT record (field)+>
+<!ELEMENT field (type , start? , end?)>
+	
+<!ATTLIST record classname CDATA #REQUIRED>
+<!ATTLIST record delimiter CDATA #IMPLIED >
+<!ATTLIST record uid CDATA #IMPLIED >
+<!ATTLIST record uidStart CDATA #IMPLIED >
+<!ATTLIST record uidEnd CDATA #IMPLIED >
+
+<!ATTLIST field name CDATA "check">
+<!ATTLIST field trim CDATA "check">
+<!ATTLIST field occurs CDATA #IMPLIED>
