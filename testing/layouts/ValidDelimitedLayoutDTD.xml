@@ -1,8 +1,6 @@
 <!DOCTYPE FileLayout [
 	<!ELEMENT record (field)+>
-	<!ELEMENT header (field)+>
-	<!ELEMENT footer (field)+>
-		<!ELEMENT field (type , start? , end?)>
+	<!ELEMENT field (type , start? , end?)>
 	
 	<!ATTLIST record classname CDATA #REQUIRED>
 	<!ATTLIST record delimiter CDATA #IMPLIED >
@@ -13,26 +11,20 @@
 	<!ATTLIST field name CDATA "check">
 	<!ATTLIST field trim CDATA "check">
 	<!ATTLIST field occurs CDATA #IMPLIED>
+	
+	<!ATTLIST type format CDATA #IMPLIED>
 ]>
 <FileLayout>
-	<record classname="org.avr.Member" >
-		<field name="firstName" trim="true" occurs="1">
-			<type>Num</type>
-		</field>
-	</record>
-
-
-	<record classname="org.avr.Member" uid="M" uidStart="0" uidEnd="1">
-		<field name="firstName" trim="true" occurs="1">
+	<record classname="test.avr.TeamSched" delimiter=";">
+		<field name="row" trim="true">
 			<type>String</type>
-			<start>2</start>
-			<end>30</end>
 		</field>
-		<field name="lastName" trim="true">
+		<field name="ourScore" >
 			<type>String</type>
-			<start>31</start>
-			<end>60</end>
 		</field>
+		<field name="opponentScore" >
+			<type>String</type>
+		</field>
+ 
 	</record>
-
 </FileLayout>

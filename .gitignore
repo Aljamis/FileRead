@@ -1,4 +1,5 @@
 bin/
+deploy/
 .settings/
 
 .project

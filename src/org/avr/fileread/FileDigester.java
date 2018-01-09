@@ -11,6 +11,13 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.avr.fileread.exceptions.ParsingException;
+import org.avr.fileread.fields.Field;
+import org.avr.fileread.fields.MegaField;
+import org.avr.fileread.records.BasicRecord;
+import org.avr.fileread.records.DelimitedLine;
+import org.avr.fileread.records.Header;
+import org.avr.fileread.records.IRecord;
+import org.avr.fileread.records.Trailer;
 import org.avr.fileread.records.UnParsableRecord;
 
 
@@ -24,9 +31,9 @@ public class FileDigester {
 	
 	private DelimitedLine delimitedLine;
 	
-	private FlatFile myFileLayouts;
-	public FlatFile getMyFileLayouts(){ return myFileLayouts; }
-	public void setMyFileLayouts(FlatFile f) { this.myFileLayouts = f; }
+	private FileLayout myFileLayouts;
+	public FileLayout getMyFileLayouts(){ return myFileLayouts; }
+	public void setMyFileLayouts(FileLayout f) { this.myFileLayouts = f; }
 
 	
 	

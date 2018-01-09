@@ -1,5 +1,7 @@
 package org.avr.fileread;
 
-class DataRecord extends BasicRecord {
+import org.avr.fileread.records.BasicRecord;
+
+public class DataRecord extends BasicRecord {
 
 }

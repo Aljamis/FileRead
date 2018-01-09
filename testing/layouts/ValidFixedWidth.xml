@@ -11,5 +11,10 @@
 			<start>31</start>
 			<end>60</end>
 		</field>
+		<field name="dob">
+			<type format="yyyyMMdd">date</type>
+			<start>62</start>
+			<end>69</end>
+		</field>
 	</record>
 </FileLayout>

@@ -1,7 +1,9 @@
-package org.avr.fileread;
+package org.avr.fileread.fields;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.avr.fileread.records.IRecord;
 
 /**
  * This class is the top level container for an object that is a member
@@ -20,7 +22,7 @@ import java.util.List;
  * @author Alfonso
  *
  */
-class MegaField extends Field implements IRecord {
+public class MegaField extends Field implements IRecord {
 	
 	private String className;
 	private List<Field> fields = new ArrayList<Field>();
@@ -29,6 +31,11 @@ class MegaField extends Field implements IRecord {
 	public void setClassName(String className) { this.className = className; }
 	public List<Field> getFields() { return fields; }
 	public void setFields(List<Field> fields) { this.fields = fields; }
+	
+	@Override
+	public void addField(Field fld) {
+		/* Do something */
+	}
 	
 	/* These 2 fields are specific to Records but as a MegaField is a type
 	 * of Record it should also have these fields	 */
@@ -47,7 +54,7 @@ class MegaField extends Field implements IRecord {
 		return this.toString("");
 	}
 	
-	protected String toString(String prefix) {
+	public String toString(String prefix) {
 		StringBuffer str = new StringBuffer();
 		str.append( prefix +"["+ this.getClass().getSimpleName() +"]  "+ this.getClassName() ).append("\n");
 		

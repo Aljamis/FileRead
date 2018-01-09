@@ -21,6 +21,10 @@ public class ParseFileLayout {
 //	}
 	
 	/**
+	 * 1 of 2 methods of Exception testing. 
+	 * Here the SPCEIFIC exception is thrown and caught while any other exception is a failure.
+	 * (see layoutFileNotFound2() for the other method)
+	 * 
 	 * Layout file does not exist
 	 * @throws Exception
 	 */
@@ -35,6 +39,11 @@ public class ParseFileLayout {
 		}
 	}
 	/**
+	 * 2 of 2 methods of Exception testing.
+	 * Here the annotation "expected" tells us specifically which exception MUST
+	 * be thrown.
+	 * (see layoutFileNotFound() for the other method)
+	 * 
 	 * Layout file does not exist - using expected.
 	 * @throws Exception
 	 */
@@ -88,7 +97,7 @@ public class ParseFileLayout {
 	}
 	
 	@Test
-	public void missingFieldType() {
+	public void TypeElementMissingFromFieldElement() {
 		try {
 			new FileReadWriter("testing/layouts/DelimitedMissingFieldType.xml");
 		} catch (Exception ex) {

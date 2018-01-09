@@ -1,4 +1,4 @@
-package org.avr.fileread;
+package org.avr.fileread.records;
 
 /**
  * For lines that are delimited the current token position MUST be managed in one central
@@ -7,7 +7,7 @@ package org.avr.fileread;
  * @author axviareque
  *
  */
-class DelimitedLine {
+public class DelimitedLine {
 	
 	private String theLine;
 	private String theDelimiter;
