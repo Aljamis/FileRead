@@ -1,6 +1,6 @@
-package org.avr.fileread;
+package org.avr.fileread.fields;
 
-class Field {
+public class Field {
 	
 	private String name;
 	private String type;

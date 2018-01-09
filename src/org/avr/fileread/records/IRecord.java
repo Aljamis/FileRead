@@ -1,6 +1,9 @@
-package org.avr.fileread;
+package org.avr.fileread.records;
 
 import java.util.List;
+
+import org.avr.fileread.exceptions.LayoutException;
+import org.avr.fileread.fields.Field;
 
 
 /**
@@ -8,7 +11,7 @@ import java.util.List;
  * @author Alfonso
  *
  */
-interface IRecord {
+public interface IRecord {
 
 	public String getClassName();
 	public List<Field> getFields();
@@ -19,4 +22,6 @@ interface IRecord {
 	public String getUid();
 	public Integer getUidStart();
 	public Integer getUidEnd();
+	
+	public void addField(Field fld) throws LayoutException;
 }

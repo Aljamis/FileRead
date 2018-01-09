@@ -1,11 +1,13 @@
-package org.avr.fileread;
+package org.avr.fileread.records;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.avr.fileread.exceptions.LayoutException;
+import org.avr.fileread.fields.Field;
+import org.avr.fileread.fields.MegaField;
 
-abstract class BasicRecord implements IRecord {
+public abstract class BasicRecord implements IRecord {
 	
 	private String className = "";
 	private String uid = "";			//  Unique record identifier
@@ -20,18 +22,22 @@ abstract class BasicRecord implements IRecord {
 	public void setClassName(String className) { this.className = className; }
 	
 	public String getUid() { return uid; }
-	public void setUid(String uid) throws LayoutException {
-		this.uid = uid;
-	}
+	public void setUid(String uid) throws LayoutException { this.uid = uid; }
 	
 	public Integer getUidStart() { return uidStart; }
-	public void setUidStart(Integer uidStart) throws LayoutException { this.uidStart = uidStart; }
+	public void setUidStart(Integer uidStart) throws LayoutException {
+		this.uidStart = uidStart; 
+	}
 	
 	public Integer getUidEnd() { return uidEnd; }
 	public void setUidEnd(Integer uidEnd) throws LayoutException { this.uidEnd = uidEnd; }
 	
 	public List<Field> getFields() { return fields; }
 	public void setFields(List<Field> fields) { this.fields = fields; }
+	public void addField(Field field) throws LayoutException {
+		validateField( field );
+		this.fields.add(field);
+	}
 	
 	public boolean isDelimited() {
 		if (delimiter == null || delimiter.trim().isEmpty() )
@@ -99,37 +105,53 @@ abstract class BasicRecord implements IRecord {
 	}
 	
 	
-	/**
-	 * Make sure uid will fit between the starting and ending positions defined.
-	 * @return
-	 * @throws LayoutException
-	 */
-	private boolean validate() throws LayoutException {
-		if ( uid != null && !uid.isEmpty() ) {
-			if (uid.length() != ( uidEnd - uidStart )) {
-				throw new LayoutException(getClassName() +" UID will not fit between positions "+ uidStart +" and "+ uidEnd );
-			}
-			return true;
-		} else {
-			/* uid is NULL but uidStart and uidEnd have values */
-			if ( ( uidStart!= null && uidEnd !=  null )
-				&& ( uidEnd > uidStart ) ) {
-				throw new LayoutException(getClassName() +" uidStart and uidEnd are defined without a uid" );
-			}
-		}
-		return true; 
-	}
 	
 	
 	/**
 	 * UID is valid ONLY if all 3 fields have a value.  If any of them is empty throw a LayoutException.
+	 * Make sure uid will fit between the starting and ending positions defined.
 	 * @return
 	 * @throws LayoutException
 	 */
 	public boolean validUID() throws LayoutException {
 		if ( uid == null && uidStart == null && uidEnd == null )
 			return true;
-		return validate();
+
+		if ( uid != null && !uid.isEmpty() ) {
+			if (uidStart == 0 && uidEnd == 0)
+				throw new LayoutException(getClassName() +" UID is defined but uidStart and uidEnd is not." );
+			if (uid.length() != ( uidEnd - uidStart )) {
+				throw new LayoutException(getClassName() +" UID will not fit between positions "+ uidStart +" and "+ uidEnd );
+			}
+			return true;
+		} else {
+			/* uid is NULL but uidStart and uidEnd have values */
+			if ( ( uidStart!= null && uidEnd !=  null ) ) {
+				throw new LayoutException(getClassName() +" uidStart and uidEnd are defined without a UID" );
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	
+	/**
+	 * If the record is not delimited
+	 *  - defined with start and end
+	 *  - start is not greater than the end
+	 * then perform Field specific validation
+	 * 
+	 * @param field
+	 * @throws LayoutException
+	 */
+	private void validateField(Field field) throws LayoutException {
+		if ( !isDelimited() ){
+			if ( field.getStart() == 0 && field.getEnd() == 0 )
+				throw new LayoutException( field.getName() +" field is missing start and end elements.");
+			if ( field.getStart() > field.getEnd() )
+				throw new LayoutException( field.getName() +" <end> position is before <start> position");
+		}
 	}
 	
 	
