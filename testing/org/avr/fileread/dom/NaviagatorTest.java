@@ -129,6 +129,17 @@ public class NaviagatorTest {
 	}
 	
 	@Test
+	public void recordWithEmptyUIDmissingStartAndEnd() {
+		try {
+			Navigator n = new Navigator();
+			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"\"><field></field></record></FileLayout>");
+		} catch (LayoutException ex) {
+			assertTrue( ex.getMessage().contains("uid attribute is undefined.") );
+			return;
+		}
+	}
+	
+	@Test
 	public void recordWithUIDandEndBeforeStart() {
 		try {			
 			Navigator n = new Navigator();

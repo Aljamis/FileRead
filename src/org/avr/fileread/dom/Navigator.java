@@ -143,7 +143,10 @@ public class Navigator {
 			throw new LayoutException("A Record requires a class type.  <"+ ele.getNodeName() +"> is missing classname attribute.");
 		
 		rec.setClassName( ele.getAttribute("classname") );
-		if ( !ele.getAttribute("uid").isEmpty() ) {
+//		if ( !ele.getAttribute("uid").isEmpty() ) {
+		if ( ele.hasAttribute("uid") ) {
+			if ( ele.getAttribute("uid").isEmpty() )
+				throw new LayoutException("uid attribute is undefined.");
 			rec.setUid( ele.getAttribute("uid"));
 			rec.setUidStart( parseInt( ele.getAttribute("uidStart") , "uidStart" , true ) );
 			rec.setUidEnd( parseInt( ele.getAttribute("uidEnd") , "uidEnd" , true ) );

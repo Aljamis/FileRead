@@ -5,3 +5,4 @@ deploy/
 .project
 .classpath
 Notes.txt
+*build.number

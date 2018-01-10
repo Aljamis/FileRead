@@ -87,6 +87,11 @@ public abstract class BasicRecord implements IRecord {
 			str.append( getUidStart() ).append("]   end [").append( getUidEnd() ).append("]");
 		}
 		
+		if ( this.getDelimiter() != null || !this.getDelimiter().isEmpty() ) {
+			str.append("\t DELIMITER [").append(getDelimiter()).append("]");
+		}
+			
+		
 		str.append("\n");
 		for (Field field : fields) {
 			if (field instanceof MegaField) {

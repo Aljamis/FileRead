@@ -221,13 +221,19 @@ public class FileDigester {
 	 * @return
 	 */
 	private boolean matchRecordType(String line , BasicRecord rec) {
-		if ( rec.isDelimited() && (rec.getUid() != null && rec.getUid().trim().length() > 0 ) ) {
+//		if ( rec.isDelimited() && (rec.getUid() != null && rec.getUid().trim().length() > 0 ) ) {
+		if ( rec.isDelimited() ) {
 			DelimitedLine deliLine = new DelimitedLine( line , rec.getDelimiter());
-			if (rec.getNumberOfFields() != deliLine.numOfTokens() ) return false;
-			if ( rec.getUid().equalsIgnoreCase( deliLine.getTheTokens()[ rec.getUidStart()] ) ) {
-				return true;
+			if (rec.getNumberOfFields() != deliLine.numOfTokens() ) 
+				return false;
+			
+			if ( rec.getUid() != null && !rec.getUid().isEmpty() ) {
+				if ( !rec.getUid().equalsIgnoreCase( deliLine.getTheTokens()[ rec.getUidStart()] ) ) {
+					// TODO test for this. Delimited record with UID defined
+					return false;
+				}
 			}
-			return false;
+			return true;
 		} else {
 			Integer start = rec.getUidStart();
 			Integer end = rec.getUidEnd();
@@ -276,7 +282,8 @@ public class FileDigester {
 	 */
 	private boolean lineIsDelimited( IRecord rec ) {
 		log.debug( "Record has "+ rec.getFields().size() +" fields      The line has "+ delimitedLine.numOfTokens() +" tokens.");
-		return delimitedLine.numOfTokens() > rec.getFields().size(); 
+//		return delimitedLine.numOfTokens() > rec.getFields().size();
+		return delimitedLine.numOfTokens() == rec.getFields().size();
 	}
 	
 	
