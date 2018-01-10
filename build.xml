@@ -18,6 +18,10 @@
 
 	<target name="TestAnt" description="Test Ant is working">
 		<echo message="BOO" />
+		<tstamp></tstamp>
+		<echo message="${TSTAMP}" />
+		<echo message="${DSTAMP}" />
+		<echo message="${TODAY}" />
 	</target>
 	
 	
@@ -37,7 +41,15 @@
 	</target>
 	
 	<target name="deployJAR"  description="Generates jar.">
+		<buildnumber file="FileReadWrite.build.number"/>
+		<tstamp></tstamp>
+		
 		<jar destfile="deploy/${appName}.jar">
+			<manifest>
+				<attribute name="Built-date" value="${TODAY}"/>
+				<attribute name="Implementation-Version" value="${build.number}"/>
+				<attribute name="Implementation-Title" value="Built - ${TODAY}"/>
+			</manifest>
 			<fileset dir="${buildDir}" includes="**/*.class"/>
 		</jar>
 		
@@ -45,5 +57,8 @@
 	</target>
 	
 	
+	
+	
+	<target name="deploy-ALL"  description="Generates jar." depends="deployClean, deployPrep, compile, deployJAR" />
 	
 </project>
