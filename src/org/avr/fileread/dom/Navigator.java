@@ -154,6 +154,7 @@ public class Navigator {
 		
 		rec.setClassName( ele.getAttribute("className") );
 		
+//		if ( !ele.getAttribute("uid").isEmpty() ) {
 		if ( ele.hasAttribute("uid") ) {
 			if ( ele.getAttribute("uid").isEmpty() )
 				throw new LayoutException("uid attribute is undefined.");
