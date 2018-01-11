@@ -28,10 +28,10 @@ public class NaviagatorTest {
 	}
 	
 	@Test
-	public void rootElementNotFileLayout() {
+	public void rootElementNotFileLayouts() {
 		try {
 			Navigator n = new Navigator();
-			n.parseFromString("<filelyout><record></record><record></record></filelyout>");
+			n.parseFromString("<filelyouts><record></record><record></record></filelyouts>");
 		} catch (LayoutException ex) {
 			assertTrue(ex.getMessage().startsWith("Root element is <"));
 		}
@@ -39,9 +39,9 @@ public class NaviagatorTest {
 	
 	@Test
 	public void delimiterIsEmpty() {
-		String xml = "<FileLayout>"
-				+ "<record classname=\"org.ClassName\" delimiter=\"\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
-				+ "</FileLayout>";
+		String xml = "<FileLayouts>"
+				+ "<record className=\"org.ClassName\" delimiter=\"\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
+				+ "</FileLayouts>";
 		try {			
 			Navigator n = new Navigator();
 			n.parseFromString( xml );
@@ -54,10 +54,10 @@ public class NaviagatorTest {
 	
 	@Test
 	public void tooManyHeadersInLayoutFile() {
-		String xml = "<FileLayout>"
-				+ "<header classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></header>"
-				+ "<header classname=\"org.ClassName2\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></header>"
-				+ "</FileLayout>";
+		String xml = "<FileLayouts>"
+				+ "<header className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></header>"
+				+ "<header className=\"org.ClassName2\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></header>"
+				+ "</FileLayouts>";
 		try {			
 			Navigator n = new Navigator();
 			n.parseFromString( xml );
@@ -70,10 +70,10 @@ public class NaviagatorTest {
 	
 	@Test
 	public void tooManyTrailersInLayoutFile() {
-		String xml = "<FileLayout>"
-				+ "<trailer classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></trailer>"
-				+ "<trailer classname=\"org.ClassName2\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></trailer>"
-				+ "</FileLayout>";
+		String xml = "<FileLayouts>"
+				+ "<trailer className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></trailer>"
+				+ "<trailer className=\"org.ClassName2\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></trailer>"
+				+ "</FileLayouts>";
 		try {			
 			Navigator n = new Navigator();
 			n.parseFromString( xml );
@@ -101,7 +101,7 @@ public class NaviagatorTest {
 	public void dataRecordMissingFields() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record/><record></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record/><record></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("A record should have have some <fields>") );
 		}
@@ -111,9 +111,9 @@ public class NaviagatorTest {
 	public void fieldIsEmpty() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
-			assertTrue( ex.getMessage().contains("is missing classname attribute") );
+			assertTrue( ex.getMessage().contains("is missing className attribute") );
 		}
 	}
 	
@@ -121,7 +121,7 @@ public class NaviagatorTest {
 	public void recordWithUIDmissingStartAndEnd() {
 		try {
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"|\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"|\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().contains(" UID is defined but uidStart and uidEnd is not.") );
 			return;
@@ -132,7 +132,7 @@ public class NaviagatorTest {
 	public void recordWithEmptyUIDmissingStartAndEnd() {
 		try {
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().contains("uid attribute is undefined.") );
 			return;
@@ -143,7 +143,7 @@ public class NaviagatorTest {
 	public void recordWithUIDandEndBeforeStart() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"|\" uidStart=\"9\" uidEnd=\"6\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"|\" uidStart=\"9\" uidEnd=\"6\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().contains(" UID will not fit between positions ") );
 			return;
@@ -155,7 +155,7 @@ public class NaviagatorTest {
 	public void recordWithUIDnotMatchingLength() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"|\" uidStart=\"9\" uidEnd=\"16\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"|\" uidStart=\"9\" uidEnd=\"16\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().contains(" UID will not fit between positions ") );
 			return;
@@ -166,7 +166,7 @@ public class NaviagatorTest {
 	@Test
 	public void recordWithStartAndEndWithoutUID() throws Exception {
 		Navigator n = new Navigator();
-		n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uidStart=\"9\" uidEnd=\"6\"><field name=\"org.ClassNamd\"><type>String</type><start>8</start><end>9</end></field></record></FileLayout>");
+		n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uidStart=\"9\" uidEnd=\"6\"><field name=\"org.ClassNamd\"><type>String</type><start>8</start><end>9</end></field></record></FileLayouts>");
 		
 		assertTrue(true);
 	}
@@ -175,7 +175,7 @@ public class NaviagatorTest {
 	public void fieldStartNotANumber() throws Exception {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"|\" uidStart=\"xx\" uidEnd=\"8\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"|\" uidStart=\"xx\" uidEnd=\"8\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("uidStart is not a valid number [") );
 			return;
@@ -187,7 +187,7 @@ public class NaviagatorTest {
 	public void fieldEndNotANumber() throws Exception {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" uid=\"|\" uidStart=\"6\" uidEnd=\"x8\"><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" uid=\"|\" uidStart=\"6\" uidEnd=\"x8\"><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("uidEnd is not a valid number [") );
 			return;
@@ -197,10 +197,10 @@ public class NaviagatorTest {
 	
 	@Test
 	public void multipleDataRecordsWithSameClassType() {
-		String xml = "<FileLayout>"
-				+ "<record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
-				+ "<record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
-				+ "</FileLayout>";
+		String xml = "<FileLayouts>"
+				+ "<record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
+				+ "<record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>8</start><end>9</end></field></record>"
+				+ "</FileLayouts>";
 		try {			
 			Navigator n = new Navigator();
 			n.parseFromString( xml );
@@ -215,7 +215,7 @@ public class NaviagatorTest {
 	public void invalidTagWhereFieldShouldBe() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\"><feld></feld></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\"><feld></feld></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" is not a valid field type (field, megaField)") );
 			return;
@@ -227,7 +227,7 @@ public class NaviagatorTest {
 	public void fieldMissingNameAttribute() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().equals("name attribute missing from <field>") );
 			return;
@@ -239,7 +239,7 @@ public class NaviagatorTest {
 	public void fieldWithInvalidNode() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"MMddyyyy\">date</type><tart>2</tart><end>7</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"MMddyyyy\">date</type><tart>2</tart><end>7</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" is not a valid node for field") );
 			return;
@@ -251,7 +251,7 @@ public class NaviagatorTest {
 	public void fieldMissingTypeNode() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\" ></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\" ></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().equals("Missing Field details (type, start, end)") );
 			return;
@@ -263,7 +263,7 @@ public class NaviagatorTest {
 	public void fieldAttributeOccursNotAnumber() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\" occurs=\"x\"><type>String</type></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\" occurs=\"x\"><type>String</type></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("Occurs is not a valid number [") );
 			return;
@@ -275,7 +275,7 @@ public class NaviagatorTest {
 	public void fieldMissingStartAndEnd() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" field is missing start and end elements.") );
 			return;
@@ -287,7 +287,7 @@ public class NaviagatorTest {
 	public void fieldStartAndEndAreZeroes() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>0</start><end>0</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>0</start><end>0</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" field is missing start and end elements.") );
 			return;
@@ -299,7 +299,7 @@ public class NaviagatorTest {
 	public void fieldEndsBeforeItStarts() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>18</start><end>9</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>String</type><start>18</start><end>9</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" <end> position is before <start> position") );
 			return;
@@ -311,7 +311,7 @@ public class NaviagatorTest {
 	public void dateFieldMissingFormat() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type>date</type><start>8</start><end>9</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type>date</type><start>8</start><end>9</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().endsWith(" missing format.") );
 			return;
@@ -323,7 +323,7 @@ public class NaviagatorTest {
 	public void dateFieldWithInvalidFormat() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"XxXx\">date</type><start>8</start><end>11</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"XxXx\">date</type><start>8</start><end>11</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("Invalid Date Format [") );
 			return;
@@ -339,7 +339,7 @@ public class NaviagatorTest {
 	public void dateFormatLengthDontMatchStartToEnd() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"MMddyyyy\">date</type><start>8</start><end>9</end></field></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><field name=\"mbrVariable\"><type format=\"MMddyyyy\">date</type><start>8</start><end>9</end></field></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().startsWith("format attribute does not match length between <start> and <end>") );
 			return;
@@ -352,7 +352,7 @@ public class NaviagatorTest {
 	public void megaFieldMissingNameAttribute() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><megaField classname=\"org.OtherClass\"><type>string</type><start>8</start><end>11</end></megaField></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><megaField className=\"org.OtherClass\"><type>string</type><start>8</start><end>11</end></megaField></record></FileLayouts>");
 		} catch (LayoutException ex) {
 			assertTrue( ex.getMessage().equals("name attribute missing from <MegaField>") );
 			return;
@@ -364,9 +364,9 @@ public class NaviagatorTest {
 	public void megaFieldMissingClassNameAttribute() {
 		try {			
 			Navigator n = new Navigator();
-			n.parseFromString("<FileLayout><record classname=\"org.ClassName\" ><megaField name=\"mbrVariable\"><type>string</type><start>8</start><end>11</end></megaField></record></FileLayout>");
+			n.parseFromString("<FileLayouts><record className=\"org.ClassName\" ><megaField name=\"mbrVariable\"><type>string</type><start>8</start><end>11</end></megaField></record></FileLayouts>");
 		} catch (LayoutException ex) {
-			assertTrue( ex.getMessage().equals("classname attribute missing from <MegaField>") );
+			assertTrue( ex.getMessage().equals("className attribute missing from <MegaField>") );
 			return;
 		}
 		fail("<MegaField> missing name attribute.");

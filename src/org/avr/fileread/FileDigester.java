@@ -229,7 +229,6 @@ public class FileDigester {
 			
 			if ( rec.getUid() != null && !rec.getUid().isEmpty() ) {
 				if ( !rec.getUid().equalsIgnoreCase( deliLine.getTheTokens()[ rec.getUidStart()] ) ) {
-					// TODO test for this. Delimited record with UID defined
 					return false;
 				}
 			}
@@ -256,7 +255,6 @@ public class FileDigester {
 	private Object parseDataRec(String line, IRecord rec) {
 		if (rec.isDelimited() ) {
 			this.delimitedLine = new DelimitedLine( line , rec.getDelimiter());
-			/* TODO check line to make sure the number of tokens matches the number of fields */
 			if ( !lineIsDelimited(rec) ) {
 				return new UnParsableRecord("Number of tokens in the delimited line does not match the number of fields in the Record" , line);
 			}
