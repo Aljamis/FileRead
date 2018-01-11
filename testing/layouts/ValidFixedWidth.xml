@@ -1,6 +1,6 @@
 <!DOCTYPE xml>
-<FileLayout>
-	<record classname="org.avr.Member" uid="M" uidStart="0" uidEnd="1">
+<FileLayouts>
+	<record className="org.avr.Member" uid="M" uidStart="0" uidEnd="1">
 		<field name="firstName" trim="true" occurs="1">
 			<type>String</type>
 			<start>2</start>
@@ -17,4 +17,4 @@
 			<end>69</end>
 		</field>
 	</record>
-</FileLayout>
+</FileLayouts>

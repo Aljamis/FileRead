@@ -36,9 +36,19 @@ public class Navigator {
 	
 	
 	
+	/**
+	 * Look for file as a resource, else look for file as a regular file.
+	 * @param fileName
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws LayoutException
+	 */
 	FileLayout parseFromFile(String fileName) throws FileNotFoundException , LayoutException {
 		logger.debug("Parsing from file:  "+ fileName);
-		this.navigateDOM( new FileInputStream( fileName ) );
+		if (  getClass().getClassLoader().getResourceAsStream( fileName ) == null )
+			this.navigateDOM( new FileInputStream( fileName ) );
+		else 
+			this.navigateDOM( getClass().getClassLoader().getResourceAsStream( fileName ));
 		
 		return layout;
 	}
@@ -76,7 +86,7 @@ public class Navigator {
 			this.layout = new FileLayout();
 			
 			Element rootEle = myDOM.getDocumentElement();
-			if ( !"FileLayout".equalsIgnoreCase( rootEle.getNodeName() ) )
+			if ( !"FileLayouts".equalsIgnoreCase( rootEle.getNodeName() ) )
 				throw new LayoutException("Root element is <"+ rootEle.getNodeName() +"> !!! It should be <FileLayout>");
 			
 			traverseRecordNodes( rootEle.getChildNodes() );
@@ -139,10 +149,11 @@ public class Navigator {
 		if ( ele.getChildNodes().getLength() == 0 )
 			throw new LayoutException("A record should have have some <fields>.  <"+ ele.getNodeName() +"> is missing some.");
 		
-		if (  ele.getAttribute("classname")  == null || "".equalsIgnoreCase(  ele.getAttribute("classname").trim() ))
-			throw new LayoutException("A Record requires a class type.  <"+ ele.getNodeName() +"> is missing classname attribute.");
+		if (  ele.getAttribute("className")  == null || "".equalsIgnoreCase(  ele.getAttribute("className").trim() ))
+			throw new LayoutException("A Record requires a class type.  <"+ ele.getNodeName() +"> is missing className attribute.");
 		
-		rec.setClassName( ele.getAttribute("classname") );
+		rec.setClassName( ele.getAttribute("className") );
+		
 //		if ( !ele.getAttribute("uid").isEmpty() ) {
 		if ( ele.hasAttribute("uid") ) {
 			if ( ele.getAttribute("uid").isEmpty() )
@@ -199,9 +210,9 @@ public class Navigator {
 			throw new LayoutException("name attribute missing from <MegaField>");
 		megaF.setName( ele.getAttribute("name"));
 		
-		if ( ele.getAttribute("classname").isEmpty() )
-			throw new LayoutException("classname attribute missing from <MegaField>");
-		megaF.setClassName( ele.getAttribute("classname") );
+		if ( ele.getAttribute("className").isEmpty() )
+			throw new LayoutException("className attribute missing from <MegaField>");
+		megaF.setClassName( ele.getAttribute("className") );
 		
 		megaF.setDelimiter( rec.getDelimiter() );
 		
